@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPW — 3-Day Call Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,600&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async></script>
+<style>
+:root {
+  --pipeline-blue:     #8EBEEF;
+  --pipeline-blue-dim: rgba(142,190,239,0.12);
+  --pipeline-blue-mid: rgba(142,190,239,0.38);
+  --surface:           #0F0F0F;
+  --surface-raised:    #161616;
+  --surface-card:      #1C1C1C;
+  --border:            rgba(142,190,239,0.10);
+  --border-strong:     rgba(142,190,239,0.25);
+  --text-primary:      #EDE9E4;
+  --text-secondary:    #8A8784;
+  --text-dim:          #7A7672;
+  --green-bright:      #52C278;
+  --amber-bright:      #F2C255;
+  --red-bright:        #E74C3C;
+  --radius:            4px;
+  --radius-lg:         8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px}
+body{font-family:'Barlow',sans-serif;background:var(--surface);color:var(--text-primary);min-height:100vh;overflow-x:hidden}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;z-index:2000;background:var(--surface);display:flex;align-items:center;justify-content:center}
+.login-card{background:var(--surface-card);border:1px solid var(--border-strong);border-radius:12px;padding:48px 44px 42px;width:400px;max-width:calc(100vw - 32px);box-shadow:0 32px 100px rgba(0,0,0,.75);display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden}
+.login-card::before{content:'';position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,var(--pipeline-blue),transparent);opacity:.5}
+.login-brand{display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:30px}
+.login-logo{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:2em;letter-spacing:.2em;color:var(--pipeline-blue);text-transform:uppercase}
+.login-wordmark{font-family:'Barlow Condensed',sans-serif;font-size:.72em;font-weight:600;letter-spacing:.22em;color:var(--text-dim);text-transform:uppercase}
+.login-rule{width:36px;height:1px;background:var(--border-strong);margin:0 0 26px 0}
+.login-heading{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.3em;letter-spacing:.04em;color:var(--text-primary);text-align:center;margin-bottom:8px}
+.login-sub{font-family:'Barlow',sans-serif;font-size:.84em;color:var(--text-secondary);text-align:center;line-height:1.55;margin-bottom:28px}
+#gsi_btn{display:flex;justify-content:center}
+.login-error{font-family:'Barlow Condensed',sans-serif;font-size:.82em;font-weight:600;letter-spacing:.08em;color:var(--red-bright);text-align:center;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.25);border-radius:var(--radius);padding:10px 16px;width:100%;display:none;margin-top:16px}
+.login-error.show{display:block}
+.login-notice{font-family:'Barlow Condensed',sans-serif;font-size:.74em;letter-spacing:.08em;color:var(--text-dim);text-align:center;margin-top:20px;line-height:1.6}
+.config-warn{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.25);border-radius:6px;padding:14px 18px;font-family:'Barlow Condensed',sans-serif;font-size:.82em;letter-spacing:.06em;color:var(--red-bright);text-align:center;line-height:1.8;width:100%}
+.config-warn span{color:var(--text-secondary)}
+
+/* APP SHELL */
+#appShell{display:none}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;padding:16px 28px 14px;border-bottom:1px solid var(--border);position:relative}
+.header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--pipeline-blue),transparent);opacity:.25}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.1em;letter-spacing:.14em;color:var(--pipeline-blue);text-transform:uppercase}
+.brand-divider{width:1px;height:14px;background:var(--border-strong)}
+.page-title{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:1.0em;letter-spacing:.1em;color:var(--text-secondary);text-transform:uppercase}
+.header-actions{display:flex;align-items:center;gap:12px}
+.live-indicator{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.88em;letter-spacing:.1em;color:var(--text-secondary);text-transform:uppercase}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green-bright);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.65)}}
+.user-chip{display:flex;align-items:center;gap:8px;background:var(--surface-card);border:1px solid var(--border);border-radius:99px;padding:3px 10px 3px 3px}
+.user-avatar{width:24px;height:24px;border-radius:50%;background:var(--pipeline-blue-dim);border:1px solid var(--pipeline-blue-mid);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72em;color:var(--pipeline-blue);overflow:hidden;flex-shrink:0}
+.user-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.user-name{font-family:'Barlow Condensed',sans-serif;font-size:.8em;font-weight:600;letter-spacing:.06em;color:var(--text-secondary);text-transform:uppercase}
+.header-btn{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.8em;letter-spacing:.1em;text-transform:uppercase;background:var(--surface-card);border:1px solid var(--border-strong);color:var(--text-secondary);padding:6px 13px;border-radius:var(--radius);cursor:pointer;transition:all .2s}
+.header-btn:hover{border-color:var(--pipeline-blue-mid);color:var(--pipeline-blue)}
+.sign-out-btn{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.8em;letter-spacing:.1em;text-transform:uppercase;background:var(--surface-card);border:1px solid var(--border-strong);color:var(--text-secondary);padding:6px 13px;border-radius:var(--radius);cursor:pointer;transition:all .2s}
+.sign-out-btn:hover{border-color:var(--red-bright);color:var(--red-bright)}
+
+/* METRICS */
+.metrics-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
+.metric{background:var(--surface);padding:12px 18px;display:flex;flex-direction:column;gap:3px;transition:background .2s}
+.metric:hover{background:var(--surface-raised)}
+.metric-value{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.9em;line-height:1;color:var(--text-primary)}
+.metric-value.blue{color:var(--pipeline-blue)}.metric-value.green{color:var(--green-bright)}.metric-value.amber{color:var(--amber-bright)}.metric-value.red{color:var(--red-bright)}
+.metric-label{font-family:'Barlow Condensed',sans-serif;font-size:.82em;font-weight:600;letter-spacing:.1em;color:var(--text-secondary);text-transform:uppercase}
+
+/* BOARD */
+.board-wrap{padding:20px 28px 28px}
+.day-columns{display:grid;grid-template-columns:116px repeat(3,1fr);gap:10px;align-items:end;margin-bottom:10px}
+.col-header{padding-bottom:6px}
+.col-header-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:.78em;font-weight:600;letter-spacing:.12em;color:var(--text-dim);text-transform:uppercase;margin-bottom:2px}
+.col-header-date{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.45em;letter-spacing:.02em;color:var(--text-primary)}
+.col-header-date.today{color:var(--pipeline-blue)}
+.col-header-goal-row{display:flex;align-items:center;gap:8px;margin-top:7px}
+.goal-label{font-family:'Barlow Condensed',sans-serif;font-size:.8em;font-weight:600;letter-spacing:.1em;color:var(--text-secondary);text-transform:uppercase;white-space:nowrap}
+.goal-bar-wrap{flex:1;height:3px;background:var(--border);border-radius:99px;overflow:hidden}
+.goal-bar-fill{height:100%;background:var(--pipeline-blue);border-radius:99px;transition:width .7s ease}
+.goal-count{font-family:'Barlow Condensed',sans-serif;font-size:.84em;font-weight:700;color:var(--pipeline-blue);min-width:38px;text-align:right}
+#boardGrid{display:grid;grid-template-columns:116px repeat(3,1fr);gap:8px 10px}
+.tech-name-cell{display:flex;align-items:flex-start;padding-top:16px}
+.tech-label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05em;letter-spacing:.06em;color:var(--text-primary);text-transform:uppercase}
+.appt-cell{background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px 10px 8px;min-height:86px;display:flex;flex-direction:column;gap:6px;transition:border-color .2s}
+.appt-cell:hover{border-color:var(--border-strong)}
+.appt-cell.is-today{border-color:rgba(142,190,239,.2)}
+.appt-cell.is-past{opacity:.65}
+.tokens-row{display:flex;flex-wrap:wrap;gap:5px;min-height:44px;align-content:flex-start}
+.token{position:relative;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s,box-shadow .15s;flex-shrink:0;border:1.5px solid transparent;user-select:none}
+.token:hover{transform:scale(1.13);box-shadow:0 4px 16px rgba(0,0,0,.5);z-index:2}
+.token-smiley{font-size:1.35em;line-height:1}
+.token-x{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.1em;color:var(--red-bright);line-height:1}
+.token.status-scheduled{background:rgba(142,190,239,.14);border-color:rgba(142,190,239,.42)}
+.token.status-completed{background:rgba(82,194,120,.15);border-color:rgba(82,194,120,.48)}
+.token.status-pending{background:rgba(242,194,85,.13);border-color:rgba(242,194,85,.42)}
+.token.status-cancelled{background:rgba(231,76,60,.12);border-color:rgba(231,76,60,.32);opacity:.75}
+.priority-dot{position:absolute;bottom:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:var(--pipeline-blue);border:1.5px solid var(--surface-card)}
+.token[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--surface-raised);border:1px solid var(--border-strong);color:var(--text-primary);font-family:'Barlow Condensed',sans-serif;font-size:.78em;letter-spacing:.06em;white-space:nowrap;padding:5px 10px;border-radius:var(--radius);z-index:20;pointer-events:none}
+.add-btn{width:34px;height:34px;border-radius:50%;background:transparent;border:1.5px dashed var(--text-dim);color:var(--text-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1em;transition:all .2s;flex-shrink:0}
+.add-btn:hover{border-color:var(--pipeline-blue);color:var(--pipeline-blue);background:var(--pipeline-blue-dim);transform:scale(1.08)}
+.totals-row{display:grid;grid-template-columns:116px repeat(3,1fr);gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.totals-label{font-family:'Barlow Condensed',sans-serif;font-size:.8em;font-weight:600;letter-spacing:.12em;color:var(--text-secondary);text-transform:uppercase;display:flex;align-items:center}
+.totals-cell{display:flex;align-items:center;gap:10px}
+.total-count{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.55em;color:var(--pipeline-blue)}
+.total-goal{font-family:'Barlow',sans-serif;font-size:.84em;font-weight:500;color:var(--text-secondary)}
+.total-goal strong{color:var(--text-primary);font-weight:600}
+.footer-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 28px;border-top:1px solid var(--border);background:var(--surface-raised);gap:20px}
+.legend{display:flex;gap:18px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:.84em;font-weight:600;letter-spacing:.08em;color:var(--text-secondary);text-transform:uppercase}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+.legend-dot.sched{background:var(--pipeline-blue);opacity:.7}.legend-dot.done{background:var(--green-bright)}.legend-dot.pend{background:var(--amber-bright)}.legend-dot.canc{background:var(--red-bright)}
+.cancel-strip{display:flex;align-items:center;gap:12px}
+.cancel-strip-label{font-family:'Barlow Condensed',sans-serif;font-size:.82em;font-weight:600;letter-spacing:.12em;color:var(--text-secondary);text-transform:uppercase;white-space:nowrap}
+.cancel-bar-wrap{width:80px;height:3px;background:var(--border);border-radius:99px;overflow:hidden}
+.cancel-bar-fill{height:100%;background:var(--red-bright);border-radius:99px;transition:width .5s ease}
+.cancel-strip-value{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05em;color:var(--text-primary)}
+
+/* DRAWER */
+.drawer-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:900;backdrop-filter:blur(3px)}
+.drawer-backdrop.open{display:block}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:480px;max-width:100vw;background:var(--surface-raised);border-left:1px solid var(--border-strong);z-index:901;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s ease}
+.drawer.open{transform:translateX(0)}
+.drawer-header{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.drawer-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.2em;letter-spacing:.04em}
+.drawer-close{background:none;border:none;color:var(--text-dim);font-size:1.2em;cursor:pointer;padding:2px;transition:color .2s}
+.drawer-close:hover{color:var(--text-primary)}
+.drawer-body{flex:1;overflow-y:auto;padding:16px 22px}
+.hist-day{margin-bottom:22px}
+.hist-day-header{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.0em;letter-spacing:.08em;color:var(--pipeline-blue);text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.hist-day-total{font-size:.85em;color:var(--text-secondary)}
+.hist-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.hist-tech{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.88em;letter-spacing:.06em;color:var(--text-secondary);text-transform:uppercase;width:70px;flex-shrink:0}
+.hist-tokens{display:flex;flex-wrap:wrap;gap:4px;flex:1}
+.hist-token{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78em}
+.hist-token.s{background:rgba(142,190,239,.15);border:1px solid rgba(142,190,239,.35)}
+.hist-token.c{background:rgba(82,194,120,.15);border:1px solid rgba(82,194,120,.4)}
+.hist-token.p{background:rgba(242,194,85,.12);border:1px solid rgba(242,194,85,.35)}
+.hist-token.x{background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.3);color:var(--red-bright);font-weight:800;font-family:'Barlow Condensed',sans-serif}
+.hist-empty{font-family:'Barlow Condensed',sans-serif;font-size:.8em;color:var(--text-dim);letter-spacing:.06em}
+
+/* MODAL */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-backdrop.open{display:flex;animation:fadein .15s ease}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes slidein{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal{background:var(--surface-card);border:1px solid var(--border-strong);border-radius:10px;width:420px;max-width:calc(100vw - 28px);box-shadow:0 24px 80px rgba(0,0,0,.65);animation:slidein .2s ease;overflow:hidden}
+.modal-header{padding:17px 22px 13px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.modal-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:.8em;font-weight:600;letter-spacing:.14em;color:var(--pipeline-blue);text-transform:uppercase}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.25em;color:var(--text-primary);letter-spacing:.03em}
+.modal-close{background:none;border:none;color:var(--text-dim);font-size:1.2em;cursor:pointer;padding:2px;line-height:1;transition:color .2s}
+.modal-close:hover{color:var(--text-primary)}
+.modal-body{padding:17px 22px;display:flex;flex-direction:column;gap:13px}
+.field-group{display:flex;flex-direction:column;gap:5px}
+.field-label{font-family:'Barlow Condensed',sans-serif;font-size:.8em;font-weight:600;letter-spacing:.1em;color:var(--text-secondary);text-transform:uppercase}
+.field-input{background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text-primary);font-family:'Barlow',sans-serif;font-size:.9em;width:100%;transition:border-color .2s;outline:none}
+.field-input:focus{border-color:var(--pipeline-blue-mid)}
+.field-input::placeholder{color:var(--text-dim)}
+select.field-input option{background:var(--surface-card)}
+.status-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.status-btn{padding:8px 4px;border-radius:var(--radius);border:1.5px solid transparent;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.78em;font-weight:600;letter-spacing:.06em;text-transform:uppercase;transition:all .15s;background:var(--surface-raised);color:var(--text-secondary)}
+.status-btn[data-val="scheduled"].active{background:rgba(142,190,239,.18);border-color:rgba(142,190,239,.45);color:var(--pipeline-blue)}
+.status-btn[data-val="completed"].active{background:rgba(82,194,120,.15);border-color:rgba(82,194,120,.48);color:var(--green-bright)}
+.status-btn[data-val="pending"].active{background:rgba(242,194,85,.12);border-color:rgba(242,194,85,.42);color:var(--amber-bright)}
+.status-btn[data-val="cancelled"].active{background:rgba(231,76,60,.12);border-color:rgba(231,76,60,.35);color:var(--red-bright)}
+.status-btn:hover:not(.active){border-color:var(--border-strong);color:var(--text-primary)}
+.priority-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 12px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--surface-raised);transition:all .2s}
+.priority-toggle.active{border-color:var(--pipeline-blue-mid);background:var(--pipeline-blue-dim)}
+.priority-indicator{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--text-dim);transition:all .2s;flex-shrink:0}
+.priority-toggle.active .priority-indicator{background:var(--pipeline-blue);border-color:var(--pipeline-blue)}
+.priority-toggle-label{font-family:'Barlow Condensed',sans-serif;font-size:.82em;font-weight:600;letter-spacing:.08em;color:var(--text-secondary);text-transform:uppercase}
+.priority-toggle.active .priority-toggle-label{color:var(--pipeline-blue)}
+.modal-footer{padding:11px 22px 17px;display:flex;gap:8px}
+.btn{flex:1;padding:10px;border:none;border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.9em;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.btn-save{background:var(--pipeline-blue);color:var(--surface)}.btn-save:hover{background:#a8d1f7}
+.btn-del{background:rgba(231,76,60,.18);color:var(--red-bright);border:1px solid rgba(231,76,60,.3)}.btn-del:hover{background:rgba(231,76,60,.32)}
+.btn-close{background:var(--surface-raised);color:var(--text-secondary);border:1px solid var(--border);flex:.65}.btn-close:hover{color:var(--text-primary);border-color:var(--border-strong)}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-logo">PPW</div>
+      <div class="login-wordmark">Prestige Plumbing Werks</div>
+    </div>
+    <div class="login-rule"></div>
+    <div class="login-heading">Call Board Access</div>
+    <div class="login-sub">Sign in with your authorized Google account to continue.</div>
+    <div id="gsi_btn"></div>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-notice">Access is restricted to PPW team members.<br>Contact your administrator to request access.</div>
+  </div>
+</div>
+
+<div id="appShell">
+  <div class="header">
+    <div class="brand">
+      <span class="brand-name">PPW</span>
+      <div class="brand-divider"></div>
+      <span class="page-title">3-Day Call Board</span>
+    </div>
+    <div class="header-actions">
+      <div class="live-indicator"><div class="live-dot"></div><span id="headerDate">—</span></div>
+      <div class="user-chip" id="userChip">
+        <div class="user-avatar" id="userAvatar">—</div>
+        <span class="user-name" id="userName">—</span>
+      </div>
+      <button class="header-btn" onclick="openDrawer()">⊞ History</button>
+      <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="metrics-bar">
+    <div class="metric"><div class="metric-value blue"  id="m-total">0</div><div class="metric-label">Total Apps</div></div>
+    <div class="metric"><div class="metric-value green" id="m-completed">0</div><div class="metric-label">Completed</div></div>
+    <div class="metric"><div class="metric-value amber" id="m-pending">0</div><div class="metric-label">Pending</div></div>
+    <div class="metric"><div class="metric-value red"   id="m-cancelled">0</div><div class="metric-label">Cancelled</div></div>
+    <div class="metric"><div class="metric-value"       id="m-priority">0</div><div class="metric-label">Priority F/U</div></div>
+  </div>
+
+  <div class="board-wrap">
+    <div class="day-columns" id="dayColHeaders"></div>
+    <div id="boardGrid"></div>
+    <div class="totals-row" id="totalsRow"><div class="totals-label">Daily<br>Totals</div></div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot sched"></div>Scheduled</div>
+      <div class="legend-item"><div class="legend-dot done"></div>Completed</div>
+      <div class="legend-item"><div class="legend-dot pend"></div>Pending</div>
+      <div class="legend-item"><div class="legend-dot canc"></div>Cancelled</div>
+    </div>
+    <div class="cancel-strip">
+      <span class="cancel-strip-label">Cancel Rate</span>
+      <div class="cancel-bar-wrap"><div class="cancel-bar-fill" id="cancelBar" style="width:0%"></div></div>
+      <span class="cancel-strip-value" id="cancelRate">0%</span>
+    </div>
+  </div>
+
+  <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <div class="drawer-title">Past Days</div>
+      <button class="drawer-close" onclick="closeDrawer()">&#x2715;</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" onclick="handleBackdropClick(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-eyebrow" id="modalEyebrow">—</div>
+          <div class="modal-title"   id="modalTitle">Appointment</div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <div class="field-group"><div class="field-label">Customer Name</div><input type="text" class="field-input" id="fName" placeholder="Full name…"></div>
+        <div class="field-group"><div class="field-label">Phone</div><input type="tel" class="field-input" id="fPhone" placeholder="(860) 000-0000"></div>
+        <div class="field-group">
+          <div class="field-label">Status</div>
+          <div class="status-buttons">
+            <button class="status-btn active" data-val="scheduled" onclick="selectStatus('scheduled')">Sched</button>
+            <button class="status-btn"        data-val="completed" onclick="selectStatus('completed')">Done</button>
+            <button class="status-btn"        data-val="pending"   onclick="selectStatus('pending')">Pending</button>
+            <button class="status-btn"        data-val="cancelled" onclick="selectStatus('cancelled')">Cancelled</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Priority</div>
+          <div class="priority-toggle" id="priorityToggle" onclick="togglePriority()">
+            <div class="priority-indicator"></div>
+            <span class="priority-toggle-label">Mark as priority follow-up</span>
+          </div>
+        </div>
+        <div class="field-group"><div class="field-label">Notes</div><textarea class="field-input" id="fNotes" rows="2" placeholder="Optional notes…"></textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-save"  onclick="saveAppt()">Save</button>
+        <button class="btn btn-del"   id="btnDel" style="display:none" onclick="deleteAppt()">Delete</button>
+        <button class="btn btn-close" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIGURE THESE TWO SETTINGS
+// ═══════════════════════════════════════════════════════════════
+// 1. Get a Client ID at console.cloud.google.com
+//    APIs & Services > Credentials > Create OAuth 2.0 Client ID
+//    Set Authorized JavaScript Origins to your hosting URL
+const GOOGLE_CLIENT_ID = '177483906229-evu10dmmav91iff73m1nt3949i8lkgtc.apps.googleusercontent.com';
+
+// 2. Add every email that should be allowed in
+const ALLOWED_EMAILS = [
+  'shea@prestigeplumbingwerks.com',
+  'lauren@prestigeplumbingwerks.com',
+  'ashley@prestigeplumbingwerks.com',
+  'anthony@prestigeplumbingwerks.com',
+  'joe@prestigeplumbingwerks.com',
+  'tyler@prestigeplumbingwerks.com',
+  'zach@prestigeplumbingwerks.com',
+];
+
+// Session expires after this many hours (user must re-login)
+const SESSION_HOURS = 10;
+// ═══════════════════════════════════════════════════════════════
+
+// ── AUTH ────────────────────────────────────────────────────
+const SESSION_KEY = 'ppw_cb_session_v1';
+
+function decodeJWT(token) {
+  try {
+    const seg = token.split('.')[1];
+    const pad = seg + '==='.slice((seg.length + 3) % 4);
+    return JSON.parse(atob(pad.replace(/-/g, '+').replace(/_/g, '/')));
+  } catch { return null; }
+}
+
+function isSessionValid() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem(SESSION_KEY));
+    if (!s || !s.email || !s.expires) return null;
+    if (Date.now() > s.expires) { sessionStorage.removeItem(SESSION_KEY); return null; }
+    return s;
+  } catch { return null; }
+}
+
+function persistSession(email, name, picture) {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+    email, name, picture,
+    expires: Date.now() + SESSION_HOURS * 3600000
+  }));
+}
+
+function handleGoogleCredential(response) {
+  const payload = decodeJWT(response.credential);
+  if (!payload) { showError('Could not verify identity. Please try again.'); return; }
+  const email   = (payload.email || '').toLowerCase().trim();
+  const allowed = ALLOWED_EMAILS.map(e => e.toLowerCase().trim());
+  if (!allowed.includes(email)) {
+    showError(email + ' is not authorized. Contact your PPW administrator.');
+    return;
+  }
+  persistSession(email, payload.name || email, payload.picture || '');
+  bootApp(payload.name || email, payload.picture || '');
+}
+
+function showError(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function bootApp(name, picture) {
+  const av = document.getElementById('userAvatar');
+  if (picture) {
+    av.innerHTML = '<img src="' + picture + '" alt="" referrerpolicy="no-referrer">';
+  } else {
+    av.textContent = name.charAt(0).toUpperCase();
+  }
+  document.getElementById('userName').textContent = name.split(' ')[0];
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appShell').style.display    = 'block';
+  render();
+}
+
+function signOut() {
+  sessionStorage.removeItem(SESSION_KEY);
+  if (typeof google !== 'undefined') google.accounts.id.disableAutoSelect();
+  location.reload();
+}
+
+window.addEventListener('load', function() {
+  var sess = isSessionValid();
+  if (sess) { bootApp(sess.name, sess.picture); return; }
+
+  var tryInit = function() {
+    if (typeof google === 'undefined') { setTimeout(tryInit, 150); return; }
+
+    if (GOOGLE_CLIENT_ID.indexOf('YOUR_CLIENT_ID_HERE') !== -1) {
+      document.getElementById('gsi_btn').innerHTML =
+        '<div style="background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.25);border-radius:6px;padding:14px 18px;font-family:Barlow Condensed,sans-serif;font-size:.82em;letter-spacing:.06em;color:#E74C3C;text-align:center;line-height:1.9;">' +
+        '&#9888; GOOGLE_CLIENT_ID not configured.<br>' +
+        '<span style="color:#8A8784;">Edit the CONFIGURE section at the top<br>of the script block to enable login.</span></div>';
+      return;
+    }
+
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback:  handleGoogleCredential,
+      auto_select: false,
+      cancel_on_tap_outside: false
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('gsi_btn'),
+      { theme:'filled_black', size:'large', width:280, text:'signin_with', shape:'rectangular', logo_alignment:'left' }
+    );
+    google.accounts.id.prompt();
+  };
+  tryInit();
+});
+
+
+// ── BOARD DATA ───────────────────────────────────────────────
+const TECHS     = ['Anthony','Joe','Tyler','Zach','Shea'];
+const DAY_GOALS = [12, 8, 4];
+const DATA_KEY  = 'ppw_callboard_v3';
+
+function loadStore()  { try { return JSON.parse(localStorage.getItem(DATA_KEY)) || {}; } catch { return {}; } }
+function saveStore(s) { localStorage.setItem(DATA_KEY, JSON.stringify(s)); }
+
+var _uid = Date.now();
+function uid() { return ++_uid; }
+function mk(status, priority) { return {id:uid(), status:status, priority:!!priority, name:'', phone:'', notes:''}; }
+
+function seedIfEmpty(store) {
+  var seeds = {
+    '2026-04-20': {
+      Anthony:[mk('scheduled'),mk('scheduled'),mk('cancelled')],
+      Joe:    [mk('scheduled'),mk('scheduled'),mk('cancelled')],
+      Tyler:  [mk('scheduled'),mk('scheduled'),mk('cancelled')],
+      Zach:   [mk('scheduled'),mk('scheduled',true),mk('cancelled')],
+      Shea:   []
+    },
+    '2026-04-21': {
+      Anthony:[mk('scheduled'),mk('cancelled')],
+      Joe:    [mk('scheduled'),mk('cancelled')],
+      Tyler:  [mk('scheduled'),mk('cancelled')],
+      Zach:   [mk('scheduled'),mk('cancelled')],
+      Shea:   []
+    },
+    '2026-04-22': {
+      Anthony:[mk('scheduled')],
+      Joe:    [mk('scheduled')],
+      Tyler:  [mk('scheduled')],
+      Zach:   [mk('scheduled')],
+      Shea:   []
+    }
+  };
+  Object.keys(seeds).forEach(function(ds) {
+    if (!store[ds]) {
+      store[ds] = {};
+      Object.keys(seeds[ds]).forEach(function(t) { store[ds][t] = seeds[ds][t]; });
+    }
+  });
+}
+
+var store = loadStore();
+seedIfEmpty(store);
+saveStore(store);
+
+// ── DATE UTILS ───────────────────────────────────────────────
+function dateKey(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function addBizDays(d, n) {
+  var c = new Date(d), a = 0;
+  while (a < n) { c.setDate(c.getDate()+1); if (c.getDay()!==0 && c.getDay()!==6) a++; }
+  return c;
+}
+function getActiveDays() {
+  var base = new Date();
+  while (base.getDay()===0 || base.getDay()===6) base = addBizDays(base, 1);
+  return [base, addBizDays(base,1), addBizDays(base,2)];
+}
+function fmtShort(d) { return d.toLocaleDateString('en-US',{month:'numeric',day:'numeric'}); }
+function fmtLong(d)  { return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}); }
+
+var todayKey   = dateKey(new Date());
+var activeDays = getActiveDays();
+
+// ── HELPERS ──────────────────────────────────────────────────
+function getAppts(ds, tech) { return (store[ds] && store[ds][tech]) ? store[ds][tech] : []; }
+function countActive(ds)    { return TECHS.reduce(function(n,t){ return n+getAppts(ds,t).filter(function(a){return a.status!=='cancelled';}).length; },0); }
+
+// ── MODAL STATE ──────────────────────────────────────────────
+var modalState  = null;
+var selStatus   = 'scheduled';
+var selPriority = false;
+
+// ── RENDER ───────────────────────────────────────────────────
+function render() {
+  document.getElementById('headerDate').textContent =
+    new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  renderColHeaders();
+  renderGrid();
+  renderTotals();
+  renderMetrics();
+}
+
+function renderColHeaders() {
+  var wrap = document.getElementById('dayColHeaders');
+  wrap.innerHTML = '<div></div>';
+  var labels = ['Today','Tomorrow','Day After'];
+  activeDays.forEach(function(d, i) {
+    var dStr = dateKey(d), tot = countActive(dStr), goal = DAY_GOALS[i];
+    var pct  = Math.min(100, Math.round((tot/goal)*100));
+    wrap.innerHTML += '<div class="col-header"><div class="col-header-eyebrow">'+labels[i]+'</div>' +
+      '<div class="col-header-date'+(dStr===todayKey?' today':'')+'">'+fmtShort(d)+'</div>' +
+      '<div class="col-header-goal-row"><span class="goal-label">Goal '+goal+'</span>' +
+      '<div class="goal-bar-wrap"><div class="goal-bar-fill" style="width:'+pct+'%"></div></div>' +
+      '<span class="goal-count">'+tot+'/'+goal+'</span></div></div>';
+  });
+}
+
+function renderGrid() {
+  var grid = document.getElementById('boardGrid');
+  grid.innerHTML = '';
+  TECHS.forEach(function(tech) {
+    var tc = document.createElement('div');
+    tc.className = 'tech-name-cell';
+    tc.innerHTML = '<span class="tech-label">'+tech+'</span>';
+    grid.appendChild(tc);
+
+    activeDays.forEach(function(d) {
+      var dStr   = dateKey(d);
+      var isPast = dStr < todayKey;
+      var cell   = document.createElement('div');
+      cell.className = 'appt-cell'+(dStr===todayKey?' is-today':'')+(isPast?' is-past':'');
+      var row = document.createElement('div');
+      row.className = 'tokens-row';
+
+      getAppts(dStr, tech).forEach(function(a) { row.appendChild(buildToken(a, tech, dStr)); });
+
+      if (!isPast) {
+        var btn = document.createElement('button');
+        btn.className = 'add-btn'; btn.textContent = '+'; btn.title = 'Add appointment';
+        btn.onclick = (function(t,ds){ return function(){ openModal(t,ds,null); }; })(tech, dStr);
+        row.appendChild(btn);
+      }
+      cell.appendChild(row);
+      grid.appendChild(cell);
+    });
+  });
+}
+
+function buildToken(appt, tech, dStr) {
+  var tok  = document.createElement('div');
+  tok.className = 'token status-'+appt.status;
+  var face = appt.status==='cancelled' ? null : appt.status==='completed' ? '&#128522;' : appt.status==='pending' ? '&#128528;' : '&#9786;';
+  tok.innerHTML = appt.status==='cancelled'
+    ? '<span class="token-x">&#x2715;</span>'
+    : '<span class="token-smiley">'+face+'</span>';
+  if (appt.priority) tok.innerHTML += '<div class="priority-dot"></div>';
+  var tip = [appt.name, appt.phone].filter(Boolean).join(' · ');
+  if (tip) tok.dataset.tip = tip;
+  tok.onclick = (function(t,ds,id){ return function(){ openModal(t,ds,id); }; })(tech, dStr, appt.id);
+  return tok;
+}
+
+function renderTotals() {
+  var row = document.getElementById('totalsRow');
+  row.innerHTML = '<div class="totals-label">Daily<br>Totals</div>';
+  activeDays.forEach(function(d, i) {
+    var dStr = dateKey(d), tot = countActive(dStr), goal = DAY_GOALS[i];
+    var div  = document.createElement('div');
+    div.className = 'totals-cell';
+    div.innerHTML = '<span class="total-count">'+tot+'</span><span class="total-goal">of <strong>'+goal+'</strong> — '+Math.min(100,Math.round((tot/goal)*100))+'%</span>';
+    row.appendChild(div);
+  });
+}
+
+function renderMetrics() {
+  var total=0, comp=0, pend=0, canc=0, prio=0;
+  activeDays.forEach(function(d) {
+    var ds = dateKey(d);
+    TECHS.forEach(function(t) {
+      getAppts(ds,t).forEach(function(a) {
+        total++;
+        if(a.status==='completed') comp++;
+        if(a.status==='pending')   pend++;
+        if(a.status==='cancelled') canc++;
+        if(a.priority) prio++;
+      });
+    });
+  });
+  document.getElementById('m-total').textContent     = total;
+  document.getElementById('m-completed').textContent = comp;
+  document.getElementById('m-pending').textContent   = pend;
+  document.getElementById('m-cancelled').textContent = canc;
+  document.getElementById('m-priority').textContent  = prio;
+  var rate = total>0 ? ((canc/total)*100).toFixed(1) : 0;
+  document.getElementById('cancelRate').textContent = rate+'%';
+  document.getElementById('cancelBar').style.width  = Math.min(100,rate)+'%';
+}
+
+// ── HISTORY DRAWER ───────────────────────────────────────────
+function openDrawer() {
+  var activeKeys = {};
+  activeDays.forEach(function(d){ activeKeys[dateKey(d)] = true; });
+  var past = Object.keys(store).filter(function(k){ return !activeKeys[k]; }).sort(function(a,b){ return b.localeCompare(a); });
+  var body = document.getElementById('drawerBody');
+
+  if (!past.length) {
+    body.innerHTML = '<div style="color:var(--text-dim);font-family:\'Barlow Condensed\',sans-serif;font-size:.88em;letter-spacing:.08em;padding-top:8px;">No history yet.</div>';
+  } else {
+    body.innerHTML = '';
+    past.forEach(function(ds) {
+      var d   = new Date(ds+'T12:00:00');
+      var tot = countActive(ds);
+      var sec = document.createElement('div');
+      sec.className = 'hist-day';
+      sec.innerHTML = '<div class="hist-day-header"><span>'+fmtLong(d)+'</span><span class="hist-day-total">'+tot+' active</span></div>';
+      TECHS.forEach(function(tech) {
+        var appts = getAppts(ds, tech);
+        var row   = document.createElement('div');
+        row.className = 'hist-row';
+        row.innerHTML = '<div class="hist-tech">'+tech+'</div>';
+        var tw = document.createElement('div');
+        tw.className = 'hist-tokens';
+        if (!appts.length) {
+          tw.innerHTML = '<span class="hist-empty">—</span>';
+        } else {
+          appts.forEach(function(a) {
+            var t    = document.createElement('div');
+            var cls  = a.status==='cancelled'?'x': a.status==='completed'?'c': a.status==='pending'?'p':'s';
+            var face = a.status==='cancelled'?'✕': a.status==='completed'?'😊': a.status==='pending'?'😐':'☺';
+            t.className = 'hist-token '+cls;
+            t.textContent = face;
+            tw.appendChild(t);
+          });
+        }
+        row.appendChild(tw);
+        sec.appendChild(row);
+      });
+      body.appendChild(sec);
+    });
+  }
+  document.getElementById('drawerBackdrop').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawerBackdrop').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+}
+
+// ── MODAL ────────────────────────────────────────────────────
+function openModal(tech, dStr, apptId) {
+  var d = activeDays.find(function(day){ return dateKey(day)===dStr; });
+  document.getElementById('modalEyebrow').textContent = tech+' · '+(d ? fmtShort(d) : dStr);
+  document.getElementById('btnDel').style.display = 'none';
+
+  if (apptId !== null) {
+    var appt = (store[dStr] && store[dStr][tech] ? store[dStr][tech] : []).find(function(a){ return a.id===apptId; });
+    if (!appt) return;
+    document.getElementById('modalTitle').textContent = 'Edit Appointment';
+    document.getElementById('fName').value  = appt.name  || '';
+    document.getElementById('fPhone').value = appt.phone || '';
+    document.getElementById('fNotes').value = appt.notes || '';
+    selectStatus(appt.status);
+    selPriority = appt.priority;
+    document.getElementById('btnDel').style.display = '';
+  } else {
+    document.getElementById('modalTitle').textContent = 'New Appointment';
+    document.getElementById('fName').value = document.getElementById('fPhone').value = document.getElementById('fNotes').value = '';
+    selectStatus('scheduled');
+    selPriority = false;
+  }
+  refreshPriorityUI();
+  modalState = {tech:tech, dStr:dStr, apptId:apptId};
+  document.getElementById('modalBackdrop').classList.add('open');
+  setTimeout(function(){ document.getElementById('fName').focus(); }, 50);
+}
+
+function closeModal() { document.getElementById('modalBackdrop').classList.remove('open'); modalState=null; }
+function handleBackdropClick(e) { if(e.target===document.getElementById('modalBackdrop')) closeModal(); }
+function selectStatus(val) { selStatus=val; document.querySelectorAll('.status-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.val===val); }); }
+function togglePriority() { selPriority=!selPriority; refreshPriorityUI(); }
+function refreshPriorityUI() { document.getElementById('priorityToggle').classList.toggle('active', selPriority); }
+
+function saveAppt() {
+  if (!modalState) return;
+  var tech=modalState.tech, dStr=modalState.dStr, apptId=modalState.apptId;
+  if (!store[dStr]) store[dStr]={};
+  if (!store[dStr][tech]) store[dStr][tech]=[];
+  var data = {
+    name:     document.getElementById('fName').value.trim(),
+    phone:    document.getElementById('fPhone').value.trim(),
+    notes:    document.getElementById('fNotes').value.trim(),
+    status:   selStatus,
+    priority: selPriority
+  };
+  if (apptId !== null) {
+    var idx = store[dStr][tech].findIndex(function(a){ return a.id===apptId; });
+    if (idx > -1) store[dStr][tech][idx] = Object.assign({}, store[dStr][tech][idx], data);
+  } else {
+    data.id = uid();
+    store[dStr][tech].push(data);
+  }
+  saveStore(store); closeModal(); render();
+}
+
+function deleteAppt() {
+  if (!modalState || modalState.apptId===null) return;
+  if (!confirm('Remove this appointment?')) return;
+  var tech=modalState.tech, dStr=modalState.dStr, apptId=modalState.apptId;
+  store[dStr][tech] = (store[dStr][tech]||[]).filter(function(a){ return a.id!==apptId; });
+  saveStore(store); closeModal(); render();
+}
+</script>
+</body>
+</html>
