@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PPW Command</title>
+<title>PPW 3DCB</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -214,10 +214,9 @@ body.mode-fun .theme-btn{border-radius:20px;border-color:rgba(233,30,140,.4)}
 .tb-btn.danger:hover{background:rgba(0,0,0,.2)}
 
 /* ── LAYOUT ── */
+.sidebar{display:none}
 .layout{display:flex;flex:1;min-height:0}
-
-/* ── SIDEBAR ── */
-.sidebar{width:210px;background:var(--panel);border-right:1px solid var(--line);padding:16px 10px;display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.main{flex:1;overflow-y:auto;padding:24px}
 .nav-btn{width:100%;border:none;border-radius:var(--r);background:transparent;color:var(--muted);text-align:left;padding:11px 14px;font-family:'Barlow Condensed',sans-serif;font-size:.95em;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .16s}
 .nav-btn:hover{background:var(--panel2);color:var(--text)}
 .nav-btn.active{background:var(--crimson-l);color:var(--crimson)}
@@ -468,11 +467,11 @@ body.mode-fun .theme-btn{border-radius:20px;border-color:rgba(233,30,140,.4)}
 <!-- ══ LOGIN ══════════════════════════════════ -->
 <div id="loginScreen">
   <div class="lcard">
-    <div class="llogo">PPW</div>
-    <div class="lsub">Prestige Plumbing Werks</div>
+    <div class="llogo">PPW 3DCB</div>
+    <div class="lsub">3-Day Call Board</div>
     <div class="lrule"></div>
-    <div class="lhead">PPW Command Access</div>
-    <p class="lp">Sign in with your authorized Google account to continue.</p>
+    <div class="lhead">Call Board Access</div>
+    <p class="lp">Sign in with your authorized PPW Google account.</p>
     <div id="gsi_btn"></div>
     <div class="lerr" id="loginErr"></div>
     <div class="lnotice">Access restricted to PPW team members.</div>
@@ -483,8 +482,8 @@ body.mode-fun .theme-btn{border-radius:20px;border-color:rgba(233,30,140,.4)}
 <div id="appShell">
   <div class="topbar">
     <div class="tb-brand">
-      <div class="tb-name">PPW Command</div>
-      <div class="tb-tag">Prestige Plumbing Werks</div>
+      <div class="tb-name">PPW 3DCB</div>
+      <div class="tb-tag">3-Day Call Board</div>
     </div>
     <div class="tb-right">
       <span class="cb-sync" id="syncSt"></span>
@@ -501,11 +500,6 @@ body.mode-fun .theme-btn{border-radius:20px;border-color:rgba(233,30,140,.4)}
     <!-- SIDEBAR -->
     <nav class="sidebar">
       <button class="nav-btn active" data-tab="callboard"><span class="nav-icon">📋</span>Call Board</button>
-      <button class="nav-btn" data-tab="csr"><span class="nav-icon">📞</span>CSR Console</button>
-      <div class="nav-divider"></div>
-      <button class="nav-btn" data-tab="dispatch"><span class="nav-icon">🚐</span>Dispatch</button>
-      <button class="nav-btn" data-tab="briefing"><span class="nav-icon">🔧</span>Tech Briefing</button>
-      <button class="nav-btn" data-tab="debrief"><span class="nav-icon">📊</span>Job Debrief</button>
     </nav>
 
     <!-- MAIN -->
@@ -565,110 +559,6 @@ body.mode-fun .theme-btn{border-radius:20px;border-color:rgba(233,30,140,.4)}
             <span class="cb-clbl">Cancel Rate</span>
             <div class="cb-cbar"><div class="cb-cfill" id="cBar" style="width:0%"></div></div>
             <span class="cb-cval" id="cRate">0%</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── CSR ── -->
-      <div id="view-csr" class="view">
-        <div class="eyebrow">CSR Console</div>
-        <div class="page-title">Call Guide</div>
-        <p class="page-copy">Pick the call type and work through the script live. Click the response that matches what the customer says.</p>
-
-        <div class="panel" style="max-width:640px">
-          <div class="panel-head">
-            <div>
-              <div class="panel-title">Call Setup</div>
-              <div class="panel-sub">Who's calling and what kind of call?</div>
-            </div>
-            <button class="btn btn-secondary" id="csr-reset-btn">Reset</button>
-          </div>
-          <div class="panel-body">
-            <div class="grid2" style="margin-bottom:14px">
-              <div class="field" style="margin-bottom:0"><label class="label">CSR</label><select class="select" id="csr-csr"></select></div>
-              <div class="field" style="margin-bottom:0"><label class="label">Technician</label><select class="select" id="csr-tech"></select></div>
-            </div>
-            <div class="field" style="margin-bottom:14px"><label class="label">Call Type</label><div class="choice-grid" id="csr-flow-buttons"></div></div>
-            <button class="btn btn-primary btn-block" id="csr-start-btn">Start Call</button>
-          </div>
-        </div>
-
-        <div id="csr-live" class="hidden" style="max-width:640px;margin-top:14px">
-          <div class="panel">
-            <div class="panel-head"><div class="panel-title" id="csr-flow-label">—</div></div>
-            <div class="panel-body stack">
-              <div class="callout blue" id="csr-script-box">—</div>
-              <div class="stack" id="csr-response-list"></div>
-              <div class="callout green hidden" id="csr-outcome"></div>
-            </div>
-          </div>
-          <div class="panel" style="margin-top:12px" id="csr-log-panel">
-            <div class="panel-head"><div class="panel-title">Call Log</div></div>
-            <div class="panel-body stack" id="csr-log"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── DISPATCH ── -->
-      <div id="view-dispatch" class="view">
-        <div class="eyebrow">Dispatch</div>
-        <div class="page-title">Pre-Dispatch</div>
-        <p class="page-copy">Fill in the essentials and generate the tech's job card.</p>
-
-        <div class="panel" style="max-width:560px">
-          <div class="panel-head"><div class="panel-title">Job Details</div></div>
-          <div class="panel-body">
-            <div class="grid2">
-              <div class="field"><label class="label">Technician</label><select class="select" id="dispatch-tech"></select></div>
-              <div class="field"><label class="label">ETA (minutes)</label><input class="input" id="dispatch-eta" type="number" min="0" value="20"></div>
-              <div class="field full"><label class="label">Address</label><input class="input" id="dispatch-address" placeholder="14 Maple St, Burlington, CT"></div>
-              <div class="field full"><label class="label">Job Type</label><select class="select" id="dispatch-jobtype"></select></div>
-              <div class="field full"><label class="label">Notes</label><textarea class="textarea" id="dispatch-notes" placeholder="Access info, flags, office context..." style="min-height:70px"></textarea></div>
-            </div>
-            <button class="btn btn-primary btn-block" id="dispatch-generate-btn">Generate Briefing &#8594;</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── BRIEFING ── -->
-      <div id="view-briefing" class="view">
-        <div class="eyebrow">Tech Briefing</div>
-        <div class="page-title">Job Card</div>
-        <p class="page-copy">Generated from dispatch. Share with the tech before they roll.</p>
-
-        <div class="panel" style="max-width:560px" id="briefing-card">
-          <div class="panel-head">
-            <div><div class="panel-title" id="briefing-title">No briefing yet</div><div class="panel-sub" id="briefing-sub">Go to Dispatch and fill out the job.</div></div>
-            <div class="tag blue" id="briefing-status">Waiting</div>
-          </div>
-          <div class="panel-body stack" id="briefing-body">
-            <div class="callout" style="color:var(--muted)">Generate a briefing from the Dispatch tab.</div>
-          </div>
-        </div>
-        <div style="margin-top:12px"><button class="btn btn-secondary" onclick="goTab('dispatch')">&#8592; Back to Dispatch</button></div>
-      </div>
-
-      <!-- ── DEBRIEF ── -->
-      <div id="view-debrief" class="view">
-        <div class="eyebrow">Job Debrief</div>
-        <div class="page-title">Closeout</div>
-        <p class="page-copy">Quick post-job record. Won or lost, what happened, who follows up.</p>
-
-        <div class="panel" style="max-width:560px">
-          <div class="panel-head"><div class="panel-title">Debrief</div></div>
-          <div class="panel-body">
-            <div class="grid2">
-              <div class="field"><label class="label">Technician</label><select class="select" id="debrief-tech"></select></div>
-              <div class="field"><label class="label">Job Type</label><select class="select" id="debrief-jobtype"></select></div>
-              <div class="field full"><label class="label">Outcome</label>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="debrief-outcome"></div>
-              </div>
-              <div class="field full"><label class="label">Notes</label><textarea class="textarea" id="debrief-notes" placeholder="What happened, what to coach, any follow-up needed?" style="min-height:90px"></textarea></div>
-              <div class="field"><label class="label">Follow-Up Owner</label><input class="input" id="debrief-owner" placeholder="Lauren"></div>
-              <div class="field"><label class="label">Follow-Up Date</label><input class="input" id="debrief-date" type="date"></div>
-            </div>
-            <button class="btn btn-primary btn-block" id="debrief-save-btn">Save Debrief</button>
-            <div class="callout green hidden" id="debrief-saved" style="margin-top:10px;text-align:center">&#10003; Saved</div>
           </div>
         </div>
       </div>
