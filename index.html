@@ -435,12 +435,6 @@ var TECHS = ['Anthony','Joe','Tyler','Zach','Shea'];
 var DEF_GOALS = [12,8,4];
 var SESS_KEY  = 'ppw_sess_v2';
 var THEME_KEY = 'ppw_theme_v1';
-
-// Apply saved theme immediately
-(function(){
-  var t = localStorage.getItem(THEME_KEY)||'dark';
-  applyTheme(t);
-})();
 var GOAL_KEY = 'ppw_goals_v1';
 
 // ═══════════════════════════
@@ -635,6 +629,9 @@ function signOut(){
 }
 
 window.addEventListener('load',function(){
+  // Apply saved theme first
+  applyTheme(localStorage.getItem(THEME_KEY)||'dark');
+
   var s=getSess();
   if(s){ bootApp(s.name,s.pic); return; }
   var try_=function(){
