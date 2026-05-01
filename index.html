@@ -348,6 +348,9 @@ body.mode-fun .theme-btn{border-radius:20px;border-color:rgba(233,30,140,.4)}
 .cb-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:.72em;font-weight:700;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;margin-bottom:1px}
 .cb-date{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.3em;color:var(--text)}
 .cb-date.next{color:var(--crimson)}
+.cb-weather{display:flex;align-items:center;gap:5px;margin-top:4px;font-family:'Barlow Condensed',sans-serif;font-size:.82em;font-weight:600;color:var(--muted);letter-spacing:.04em}
+.cb-weather-icon{font-size:1.05em;line-height:1}
+.cb-weather-temp{color:var(--text)}
 .cb-goal-row{display:flex;align-items:center;gap:6px;margin-top:5px}
 .cb-glbl{font-family:'Barlow Condensed',sans-serif;font-size:.72em;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;white-space:nowrap}
 .cb-ginp{font-family:'Barlow Condensed',sans-serif;font-size:.72em;font-weight:700;color:var(--crimson);background:transparent;border:none;outline:none;width:26px;text-align:center;cursor:default;-moz-appearance:textfield}
@@ -570,71 +573,59 @@ body.mode-fun .theme-btn{border-radius:20px;border-color:rgba(233,30,140,.4)}
       <div id="view-csr" class="view">
         <div class="eyebrow">CSR Console</div>
         <div class="page-title">Call Guide</div>
-        <p class="page-copy">Set up the call, pick a call type, and work through the branching script live.</p>
-        <div class="grid2">
-          <div class="panel">
-            <div class="panel-head"><div><div class="panel-title">Call Setup</div><div class="panel-sub">Load context and launch the flow.</div></div></div>
-            <div class="panel-body">
-              <div class="grid2">
-                <div class="field"><label class="label">CSR</label><select class="select" id="csr-csr"></select></div>
-                <div class="field"><label class="label">Technician</label><select class="select" id="csr-tech"></select></div>
-                <div class="field"><label class="label">Customer Name</label><input class="input" id="csr-customer" placeholder="Mr. Henderson"></div>
-                <div class="field"><label class="label">Job / Service</label><input class="input" id="csr-job" placeholder="Water heater replacement"></div>
-                <div class="field full"><label class="label">Call Type</label><div class="choice-grid" id="csr-flow-buttons"></div></div>
-              </div>
-              <button class="btn btn-primary btn-block" id="csr-start-btn">Start Call Flow</button>
+        <p class="page-copy">Pick the call type and work through the script live. Click the response that matches what the customer says.</p>
+
+        <div class="panel" style="max-width:640px">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">Call Setup</div>
+              <div class="panel-sub">Who's calling and what kind of call?</div>
             </div>
+            <button class="btn btn-secondary" id="csr-reset-btn">Reset</button>
           </div>
-          <div class="panel">
-            <div class="panel-head">
-              <div><div class="panel-title">Live Call View</div><div class="panel-sub">Match the customer to the closest response.</div></div>
-              <button class="btn btn-secondary" id="csr-reset-btn">Reset</button>
+          <div class="panel-body">
+            <div class="grid2" style="margin-bottom:14px">
+              <div class="field" style="margin-bottom:0"><label class="label">CSR</label><select class="select" id="csr-csr"></select></div>
+              <div class="field" style="margin-bottom:0"><label class="label">Technician</label><select class="select" id="csr-tech"></select></div>
             </div>
+            <div class="field" style="margin-bottom:14px"><label class="label">Call Type</label><div class="choice-grid" id="csr-flow-buttons"></div></div>
+            <button class="btn btn-primary btn-block" id="csr-start-btn">Start Call</button>
+          </div>
+        </div>
+
+        <div id="csr-live" class="hidden" style="max-width:640px;margin-top:14px">
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title" id="csr-flow-label">—</div></div>
             <div class="panel-body stack">
-              <div class="callout blue" id="csr-opening">No call started yet.</div>
-              <div class="callout" id="csr-script">Start a call to load the script.</div>
+              <div class="callout blue" id="csr-script-box">—</div>
               <div class="stack" id="csr-response-list"></div>
               <div class="callout green hidden" id="csr-outcome"></div>
             </div>
           </div>
-        </div>
-        <div class="panel">
-          <div class="panel-head"><div><div class="panel-title">Call Log</div><div class="panel-sub">Live transcript of this call path.</div></div></div>
-          <div class="panel-body stack" id="csr-log"></div>
+          <div class="panel" style="margin-top:12px" id="csr-log-panel">
+            <div class="panel-head"><div class="panel-title">Call Log</div></div>
+            <div class="panel-body stack" id="csr-log"></div>
+          </div>
         </div>
       </div>
 
       <!-- ── DISPATCH ── -->
       <div id="view-dispatch" class="view">
         <div class="eyebrow">Dispatch</div>
-        <div class="page-title">Pre-Dispatch Handoff</div>
-        <p class="page-copy">Fill out the job details and generate a clean tech briefing card.</p>
-        <div class="grid2">
-          <div class="panel">
-            <div class="panel-head"><div><div class="panel-title">Dispatch Setup</div><div class="panel-sub">Capture context before the truck rolls.</div></div></div>
-            <div class="panel-body">
-              <div class="grid2">
-                <div class="field"><label class="label">CSR</label><select class="select" id="dispatch-csr"></select></div>
-                <div class="field"><label class="label">Technician</label><select class="select" id="dispatch-tech"></select></div>
-                <div class="field"><label class="label">Customer</label><input class="input" id="dispatch-customer" placeholder="Customer name"></div>
-                <div class="field"><label class="label">ETA (minutes)</label><input class="input" id="dispatch-eta" type="number" min="0"></div>
-                <div class="field full"><label class="label">Address</label><input class="input" id="dispatch-address" placeholder="14 Maple St, Burlington, CT"></div>
-                <div class="field full"><label class="label">Job Type</label><select class="select" id="dispatch-jobtype"></select></div>
-                <div class="field full"><label class="label">Customer Flags</label><div class="choice-grid" id="dispatch-flags"></div></div>
-                <div class="field"><label class="label">Access Notes</label><textarea class="textarea" id="dispatch-access" placeholder="Gate code, dogs, park in back..."></textarea></div>
-                <div class="field"><label class="label">Office Notes</label><textarea class="textarea" id="dispatch-office" placeholder="Prior concern, billing sensitivity..."></textarea></div>
-              </div>
-              <button class="btn btn-primary btn-block" id="dispatch-generate-btn">Generate Tech Briefing</button>
+        <div class="page-title">Pre-Dispatch</div>
+        <p class="page-copy">Fill in the essentials and generate the tech's job card.</p>
+
+        <div class="panel" style="max-width:560px">
+          <div class="panel-head"><div class="panel-title">Job Details</div></div>
+          <div class="panel-body">
+            <div class="grid2">
+              <div class="field"><label class="label">Technician</label><select class="select" id="dispatch-tech"></select></div>
+              <div class="field"><label class="label">ETA (minutes)</label><input class="input" id="dispatch-eta" type="number" min="0" value="20"></div>
+              <div class="field full"><label class="label">Address</label><input class="input" id="dispatch-address" placeholder="14 Maple St, Burlington, CT"></div>
+              <div class="field full"><label class="label">Job Type</label><select class="select" id="dispatch-jobtype"></select></div>
+              <div class="field full"><label class="label">Notes</label><textarea class="textarea" id="dispatch-notes" placeholder="Access info, flags, office context..." style="min-height:70px"></textarea></div>
             </div>
-          </div>
-          <div class="panel">
-            <div class="panel-head"><div><div class="panel-title">Dispatch Standards</div><div class="panel-sub">Reinforce these behaviors every dispatch.</div></div></div>
-            <div class="panel-body stack">
-              <div class="callout">Confirm ETA before the customer wonders where the tech is.</div>
-              <div class="callout">Make access notes visible before arrival — no surprises.</div>
-              <div class="callout">Surface risk flags so the tech walks in prepared.</div>
-              <div class="callout">Capture office notes instead of relying on memory.</div>
-            </div>
+            <button class="btn btn-primary btn-block" id="dispatch-generate-btn">Generate Briefing &#8594;</button>
           </div>
         </div>
       </div>
@@ -642,24 +633,16 @@ body.mode-fun .theme-btn{border-radius:20px;border-color:rgba(233,30,140,.4)}
       <!-- ── BRIEFING ── -->
       <div id="view-briefing" class="view">
         <div class="eyebrow">Tech Briefing</div>
-        <div class="page-title">Field-Ready Job Card</div>
-        <p class="page-copy">Generated from dispatch. Quick to scan from the van or driveway.</p>
-        <div class="grid2">
-          <div class="panel">
-            <div class="panel-head">
-              <div><div class="panel-title" id="briefing-title">No briefing yet</div><div class="panel-sub" id="briefing-sub">Build one from the Dispatch tab.</div></div>
-              <div class="tag blue" id="briefing-status">Waiting</div>
-            </div>
-            <div class="panel-body stack">
-              <div class="sum-grid" id="briefing-summary"></div>
-              <div><div class="sum-label">Flags</div><div class="tag-row" id="briefing-flags"></div></div>
-              <div id="briefing-access-wrap" class="hidden"><div class="sum-label">Access Notes</div><div class="callout" id="briefing-access"></div></div>
-              <div id="briefing-office-wrap" class="hidden"><div class="sum-label">Office Notes</div><div class="callout" id="briefing-office"></div></div>
-            </div>
+        <div class="page-title">Job Card</div>
+        <p class="page-copy">Generated from dispatch. Share with the tech before they roll.</p>
+
+        <div class="panel" style="max-width:560px" id="briefing-card">
+          <div class="panel-head">
+            <div><div class="panel-title" id="briefing-title">No briefing yet</div><div class="panel-sub" id="briefing-sub">Go to Dispatch and fill out the job.</div></div>
+            <div class="tag blue" id="briefing-status">Waiting</div>
           </div>
-          <div class="panel">
-            <div class="panel-head"><div><div class="panel-title">Arrival Reminders</div><div class="panel-sub">The list the tech should actually read.</div></div></div>
-            <div class="panel-body stack" id="briefing-reminders"></div>
+          <div class="panel-body stack" id="briefing-body">
+            <div class="callout" style="color:var(--muted)">Generate a briefing from the Dispatch tab.</div>
           </div>
         </div>
         <div style="margin-top:12px"><button class="btn btn-secondary" onclick="goTab('dispatch')">&#8592; Back to Dispatch</button></div>
@@ -668,37 +651,24 @@ body.mode-fun .theme-btn{border-radius:20px;border-color:rgba(233,30,140,.4)}
       <!-- ── DEBRIEF ── -->
       <div id="view-debrief" class="view">
         <div class="eyebrow">Job Debrief</div>
-        <div class="page-title">Coaching Closeout</div>
-        <p class="page-copy">Capture the result, blockers, and coaching notes so patterns are visible and follow-ups don't get missed.</p>
-        <div class="grid2">
-          <div class="panel">
-            <div class="panel-head"><div><div class="panel-title">Debrief Input</div><div class="panel-sub">What happened and what needs to be coached.</div></div></div>
-            <div class="panel-body">
-              <div class="grid2">
-                <div class="field"><label class="label">Customer</label><input class="input" id="debrief-customer" placeholder="Customer name"></div>
-                <div class="field"><label class="label">Technician</label><select class="select" id="debrief-tech"></select></div>
-                <div class="field"><label class="label">Job Type</label><select class="select" id="debrief-jobtype"></select></div>
-                <div class="field"><label class="label">Outcome</label><div class="choice-grid-2" id="debrief-outcome"></div></div>
-                <div class="field full"><label class="label">Objections / Blockers</label><div class="choice-grid" id="debrief-objections"></div></div>
-                <div class="field full"><label class="label">Coaching Notes</label><textarea class="textarea" id="debrief-notes" placeholder="What happened, what was said, what to coach, what follow-up is needed?"></textarea></div>
-                <div class="field"><label class="label">Follow-Up Owner</label><input class="input" id="debrief-owner"></div>
-                <div class="field"><label class="label">Follow-Up Date</label><input class="input" id="debrief-date" type="date"></div>
+        <div class="page-title">Closeout</div>
+        <p class="page-copy">Quick post-job record. Won or lost, what happened, who follows up.</p>
+
+        <div class="panel" style="max-width:560px">
+          <div class="panel-head"><div class="panel-title">Debrief</div></div>
+          <div class="panel-body">
+            <div class="grid2">
+              <div class="field"><label class="label">Technician</label><select class="select" id="debrief-tech"></select></div>
+              <div class="field"><label class="label">Job Type</label><select class="select" id="debrief-jobtype"></select></div>
+              <div class="field full"><label class="label">Outcome</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="debrief-outcome"></div>
               </div>
+              <div class="field full"><label class="label">Notes</label><textarea class="textarea" id="debrief-notes" placeholder="What happened, what to coach, any follow-up needed?" style="min-height:90px"></textarea></div>
+              <div class="field"><label class="label">Follow-Up Owner</label><input class="input" id="debrief-owner" placeholder="Lauren"></div>
+              <div class="field"><label class="label">Follow-Up Date</label><input class="input" id="debrief-date" type="date"></div>
             </div>
-          </div>
-          <div class="panel">
-            <div class="panel-head"><div><div class="panel-title">6-Step Agenda Scoring</div><div class="panel-sub" id="debrief-score-sub">Current adherence: 100%</div></div></div>
-            <div class="panel-body" id="debrief-agenda"></div>
-          </div>
-        </div>
-        <div class="panel" style="margin-top:14px">
-          <div class="panel-head"><div><div class="panel-title">Debrief Summary</div></div></div>
-          <div class="panel-body grid2">
-            <div class="stack" id="debrief-summary-left"></div>
-            <div class="stack">
-              <div><div class="sum-label">Objections</div><div class="tag-row" id="debrief-summary-objections"></div></div>
-              <div><div class="sum-label">Coaching Note</div><div class="callout" id="debrief-summary-note">No note yet.</div></div>
-            </div>
+            <button class="btn btn-primary btn-block" id="debrief-save-btn">Save Debrief</button>
+            <div class="callout green hidden" id="debrief-saved" style="margin-top:10px;text-align:center">&#10003; Saved</div>
           </div>
         </div>
       </div>
@@ -854,6 +824,44 @@ var cbOutDays={};
 var mState=null;
 var mStat='scheduled';
 var mPrio=false;
+var weatherCache={}; // dateStr -> {icon, temp}
+
+// ── WEATHER ──
+var WMO_ICONS={
+  0:'☀️',1:'🌤️',2:'⛅',3:'☁️',
+  45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌧️',
+  61:'🌧️',63:'🌧️',65:'🌧️',
+  71:'🌨️',73:'🌨️',75:'❄️',77:'❄️',
+  80:'🌦️',81:'🌧️',82:'⛈️',
+  85:'🌨️',86:'❄️',
+  95:'⛈️',96:'⛈️',99:'⛈️'
+};
+
+function fetchWeather() {
+  // Open-Meteo — free, no API key, 256 Spielman Hwy Burlington CT
+  var lat = 41.7615, lon = -72.9654;
+  var dates = cbDays.map(function(d){ return dateKey(d); });
+  var start = dates[0], end = dates[dates.length-1];
+  var url = 'https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
+    '&daily=weathercode,temperature_2m_max&temperature_unit=fahrenheit&timezone=America%2FNew_York'+
+    '&start_date='+start+'&end_date='+end;
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if(!data.daily) return;
+      data.daily.time.forEach(function(ds, i) {
+        var code = data.daily.weathercode[i];
+        var temp = Math.round(data.daily.temperature_2m_max[i]);
+        weatherCache[ds] = {
+          icon: WMO_ICONS[code] || '🌡️',
+          temp: temp
+        };
+      });
+      renderCBHeaders();
+    })
+    .catch(function(){ /* silent fail — weather is nice-to-have */ });
+}
 
 function loadGoals(){try{return JSON.parse(localStorage.getItem(GOAL_KEY))||DEF_GOALS.slice();}catch{return DEF_GOALS.slice();}}
 function saveGoalsLocal(){localStorage.setItem(GOAL_KEY,JSON.stringify(cbGoals));}
@@ -922,8 +930,8 @@ function setAppts(ds,tech,arr){if(!cbCache[ds])cbCache[ds]={};cbCache[ds][tech]=
 function countActive(ds){return CB_TECHS.reduce(function(n,t){return n+getAppts(ds,t).filter(function(a){return a.status!=='cancelled';}).length;},0);}
 var _uid=Date.now();function uid(){return++_uid;}
 
-function initCB(){computeDays();startListeners();scheduleMidnight();}
-function reinitCB(){computeDays();startListeners();}
+function initCB(){computeDays();startListeners();fetchWeather();scheduleMidnight();}
+function reinitCB(){computeDays();startListeners();fetchWeather();}
 function goDefault(){cbAnchor=nextBizFrom(new Date());reinitCB();}
 function shiftDay(n){cbAnchor=addBiz(cbAnchor,n);reinitCB();}
 function shiftWeek(n){cbAnchor=addDays(cbAnchor,n*7);reinitCB();}
@@ -975,9 +983,12 @@ function renderCBHeaders(){
   cbDays.forEach(function(d,i){
     var ds=dateKey(d),tot=countActive(ds),goal=cbGoals[i],pct=Math.min(100,Math.round((tot/goal)*100));
     var isNext=ds===dateKey(nextBizFrom(new Date()));
+    var wx=weatherCache[ds];
+    var wxHtml=wx?'<div class="cb-weather"><span class="cb-weather-icon">'+wx.icon+'</span><span class="cb-weather-temp">'+wx.temp+'°F</span></div>':'';
     var div=document.createElement('div');div.className='cb-col-hdr';
     div.innerHTML='<div class="cb-eyebrow">'+eyebrowLbl(d)+'</div>'+
-      '<div class="cb-date'+(isNext?' next':'')+'">'+fmtS(d)+'</div>'+
+      '<div class="cb-date'+(isNext?' next':'')+'" style="display:flex;align-items:center;gap:8px;">'+fmtS(d)+'</div>'+
+      wxHtml+
       '<div class="cb-goal-row">'+
         '<span class="cb-glbl">Goal</span>'+
         '<input class="cb-ginp'+(cbEditGoals?' editing':'')+'" type="number" min="1" max="99" value="'+goal+'" '+(cbEditGoals?'':'readonly')+
@@ -1140,174 +1151,212 @@ function delAppt(){
 // ═══════════════════════
 // OPS KIT
 // ═══════════════════════
-var OPS_KEY='ppw-ops-kit-v1-html';
 var TEAM={csrs:['Ashley','Mollie'],techs:['Anthony','Joe','Tyler','Zach']};
 var JOB_TYPES=['Diagnostic','Drain Repair / Clearing','Supply Line Repair','Water Heater Repair','Water Heater Installation','Fixture Install / Repair','Leak Detection & Repair','Annual Maintenance Inspection','Emergency Service','Other'];
-var CUSTOMER_FLAGS=[{id:'priorComplaint',label:'Prior Complaint',tone:'red'},{id:'member',label:'Active Member',tone:'green'},{id:'financing',label:'Pre-Approved Financing',tone:'blue'},{id:'difficult',label:'Difficult Customer',tone:'amber'},{id:'referral',label:'Referral',tone:'purple'},{id:'membershipOpp',label:'Membership Opportunity',tone:'slate'}];
-var DEBRIEF_OBJECTIONS=['Price too high','Need to think about it','Need spouse / partner approval','Going with competitor','Could not finance','No decision maker present','Customer deferred','Timing issue','Trust issue','Parts unavailable'];
-var AGENDA_STEPS=['Professional introduction','Thorough diagnosis','Presented all 3 options','Made a recommendation','Handled objections','Closed and collected'];
+
 var CSR_FLOWS={
-  serviceCheckIn:{label:'Service Check-In',tone:'blue',opening:function(x){return'Hi '+x.customer+', this is '+x.csr+' with Prestige Plumbing Werks. '+x.tech+' was out recently for '+x.job+'. Do you have a quick minute to chat?';},nodes:{root:{script:'Listen first. Match the customer tone, then move to the closest path.',responses:[{label:'Everything went great',mood:'green',next:'review'},{label:'Mostly good, one small issue',mood:'amber',next:'feedback'},{label:'Still having the same issue',mood:'red',next:'redo'},{label:'The tech was excellent',mood:'blue',next:'compliment'},{label:'I was not happy',mood:'red',next:'escalate'}]},review:{script:'That is great to hear. If you have a spare moment, a quick Google review really helps us.',responses:[{label:"I'll leave a review",mood:'green',outcome:'Review committed'},{label:'Not today, but all good',mood:'slate',outcome:'Positive close'}]},feedback:{script:"I appreciate that. What was the one thing we could have done better?",responses:[{label:'Just wanted it noted',mood:'amber',outcome:'Feedback logged'},{label:'I want someone to address it',mood:'red',outcome:'Follow-up required'}]},redo:{script:"I'm sorry to hear that. Let's get this corrected. Offer a no-charge return visit.",responses:[{label:'Send the same tech back',mood:'green',outcome:'Redo scheduled'},{label:'Send someone else',mood:'amber',outcome:'Redo - different tech'},{label:'I want a manager first',mood:'red',outcome:'Escalated to Lauren'}]},compliment:{script:'Pass the compliment along, then make a light review ask.',responses:[{label:'Happy to leave a review',mood:'green',outcome:'Review committed + compliment'},{label:'Too busy for a review',mood:'blue',outcome:'Compliment logged'}]},escalate:{script:"Do not defend. Do not over-explain. Capture the issue and escalate to Lauren.",responses:[{label:'Please have Lauren call me',mood:'red',outcome:'Escalated to Lauren'},{label:'I just wanted it noted',mood:'amber',outcome:'Complaint logged'}]}}},
-  membership:{label:'Membership Check-In',tone:'green',opening:function(x){return"Hi "+x.customer+", this is "+x.csr+" with Prestige Plumbing Werks. I'm checking in on your membership and making sure everything still looks good on your end.";},nodes:{root:{script:'Confirm satisfaction, plan value, and whether there are any plumbing concerns.',responses:[{label:"Everything's good",mood:'green',outcome:'Membership healthy'},{label:'I may need service soon',mood:'amber',outcome:'Scheduling opportunity'},{label:"I'm not sure the plan is worth it",mood:'red',outcome:'Retention follow-up'}]}}},
-  inboundUpset:{label:'Inbound Upset',tone:'red',opening:function(x){return'Thank you for calling Prestige Plumbing Werks. This is '+x.csr+'. I\'m sorry something went wrong, '+x.customer+'. Tell me what happened.';},nodes:{root:{script:'Let them finish. Capture the issue without interrupting. Then route to the right outcome.',responses:[{label:'Job issue / still broken',mood:'red',outcome:'Redo triage'},{label:'Price complaint',mood:'amber',outcome:'Billing review follow-up'},{label:'Tech behavior complaint',mood:'red',outcome:'Manager escalation'},{label:'Damage / mess complaint',mood:'red',outcome:'Urgent escalation'}]}}}
+  serviceCheckIn:{label:'Service Check-In',opening:function(x){return'Hi, this is '+x.csr+' with Prestige Plumbing Werks. '+x.tech+' was recently out for a service call. Do you have a quick minute to chat?';},nodes:{
+    root:{script:'Listen first. Match the customer tone, then click the closest response below.',responses:[
+      {label:'Everything went great',next:'review'},
+      {label:'Mostly good, one small issue',next:'feedback'},
+      {label:'Still having the same issue',next:'redo'},
+      {label:'The tech was excellent',next:'compliment'},
+      {label:'I was not happy',next:'escalate'}
+    ]},
+    review:{script:"That's great to hear. If you have a spare moment, a quick Google review really helps us reach more homeowners.",responses:[
+      {label:"I'll leave a review",outcome:'Review committed'},
+      {label:'Not today, but all good',outcome:'Positive close'}
+    ]},
+    feedback:{script:"I appreciate that. What was the one thing we could have done better? I'll make sure it gets noted.",responses:[
+      {label:'Just wanted it noted',outcome:'Feedback logged'},
+      {label:'I want someone to follow up',outcome:'Follow-up required'}
+    ]},
+    redo:{script:"I'm sorry to hear that. Let's get this corrected at no charge. Would you like the same tech or fresh eyes?",responses:[
+      {label:'Send the same tech',outcome:'Redo scheduled'},
+      {label:'Send someone different',outcome:'Redo — different tech'},
+      {label:'I want to speak with a manager',outcome:'Escalated to Lauren'}
+    ]},
+    compliment:{script:"That's wonderful — I'll make sure he hears that. Would you be open to leaving a quick Google review?",responses:[
+      {label:'Happy to leave a review',outcome:'Review committed + compliment logged'},
+      {label:'Too busy right now',outcome:'Compliment logged'}
+    ]},
+    escalate:{script:"I hear you and I'm sorry. I'm not going to make excuses. Let me get the right person involved.",responses:[
+      {label:'Please have someone call me',outcome:'Escalated to Lauren'},
+      {label:'I just wanted it on record',outcome:'Complaint logged'}
+    ]}
+  }},
+  membership:{label:'Membership Check-In',opening:function(x){return'Hi, this is '+x.csr+' with Prestige Plumbing Werks, just checking in on your membership to make sure everything looks good on your end.';},nodes:{
+    root:{script:'Confirm they are satisfied and see if there are any upcoming plumbing needs.',responses:[
+      {label:"All good, thanks",outcome:'Membership healthy'},
+      {label:'I may need something soon',outcome:'Scheduling opportunity — follow up'},
+      {label:"I'm not sure it's worth it",outcome:'Retention risk — flag for Lauren'}
+    ]}
+  }},
+  inboundUpset:{label:'Inbound Upset',opening:function(x){return'Thank you for calling Prestige Plumbing Werks, this is '+x.csr+'. I\'m sorry something went wrong — tell me what happened.';},nodes:{
+    root:{script:"Let them finish completely before responding. Don't defend. Capture the issue, then route it.",responses:[
+      {label:'Job issue / still broken',outcome:'Redo triage — schedule callback'},
+      {label:'Price complaint',outcome:'Billing review — flag for Lauren'},
+      {label:'Tech behavior complaint',outcome:'Urgent escalation to Lauren'},
+      {label:'Damage or mess',outcome:'Urgent escalation to Lauren'}
+    ]}
+  }}
 };
 
-var initialState={activeModule:'home',csrDraft:{csr:TEAM.csrs[0],customer:'',tech:TEAM.techs[0],job:'',flow:'serviceCheckIn'},csrSession:null,dispatchDraft:{csr:TEAM.csrs[0],tech:TEAM.techs[0],customer:'',address:'',jobType:JOB_TYPES[0],eta:20,accessNotes:'',officeNotes:'',flags:[]},briefing:null,debriefDraft:{customer:'',tech:TEAM.techs[0],jobType:JOB_TYPES[0],outcome:'won',objections:[],agenda:AGENDA_STEPS.reduce(function(acc,s){acc[s]='yes';return acc;},{}),notes:'',followUpOwner:'Lauren',followUpDate:''}};
-
-var opsState;
-function loadOpsState(){try{var r=localStorage.getItem(OPS_KEY);return r?JSON.parse(r):JSON.parse(JSON.stringify(initialState));}catch{return JSON.parse(JSON.stringify(initialState));}}
-function saveOpsState(){localStorage.setItem(OPS_KEY,JSON.stringify(opsState));}
-function setState(fn){opsState=fn(opsState);saveOpsState();renderOps();}
-function $(id){return document.getElementById(id);}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function toneClass(t){return'on-'+t;}
+var opsState={
+  csr:TEAM.csrs[0], tech:TEAM.techs[0], flow:'serviceCheckIn', session:null,
+  dispatch:{tech:TEAM.techs[0],eta:20,address:'',jobType:JOB_TYPES[0],notes:''},
+  briefing:null,
+  debrief:{tech:TEAM.techs[0],jobType:JOB_TYPES[0],outcome:'won',notes:'',owner:'Lauren',date:''}
+};
 
 function initOps(){
-  opsState=loadOpsState();
+  renderCSR();
+  renderDispatch();
+  renderDebrief();
   bindOpsEvents();
-  renderOps();
 }
 
-function renderOps(){renderCSR();renderDispatch();renderBriefing();renderDebrief();}
-
+// ── CSR ──
 function renderCSR(){
-  // selects
-  $('csr-csr').innerHTML=TEAM.csrs.map(function(c){return'<option'+(c===opsState.csrDraft.csr?' selected':'')+'>'+c+'</option>';}).join('');
-  $('csr-tech').innerHTML=TEAM.techs.map(function(t){return'<option'+(t===opsState.csrDraft.tech?' selected':'')+'>'+t+'</option>';}).join('');
-  $('csr-customer').value=opsState.csrDraft.customer;
-  $('csr-job').value=opsState.csrDraft.job;
-  // flow buttons
-  $('csr-flow-buttons').innerHTML=Object.keys(CSR_FLOWS).map(function(k){return'<button class="choice-btn'+(opsState.csrDraft.flow===k?' on-blue':'')+'" data-csr-flow="'+k+'">'+CSR_FLOWS[k].label+'</button>';}).join('');
-  // session
-  var sess=opsState.csrSession;
-  if(!sess){
-    $('csr-opening').textContent='No call started yet.';
-    $('csr-script').textContent='Start a call to load the script.';
-    $('csr-response-list').innerHTML='';
-    $('csr-outcome').classList.add('hidden');
-    $('csr-log').innerHTML='';
+  var el=$('csr-csr');if(el)el.innerHTML=TEAM.csrs.map(function(c){return'<option'+(c===opsState.csr?' selected':'')+'>'+c+'</option>';}).join('');
+  var et=$('csr-tech');if(et)et.innerHTML=TEAM.techs.map(function(t){return'<option'+(t===opsState.tech?' selected':'')+'>'+t+'</option>';}).join('');
+  var fb=$('csr-flow-buttons');
+  if(fb)fb.innerHTML=Object.keys(CSR_FLOWS).map(function(k){return'<button class="choice-btn'+(opsState.flow===k?' on-blue':'')+'" data-csr-flow="'+k+'">'+CSR_FLOWS[k].label+'</button>';}).join('');
+
+  var live=$('csr-live');
+  if(!opsState.session){if(live)live.classList.add('hidden');return;}
+  if(live)live.classList.remove('hidden');
+
+  var sess=opsState.session;
+  var lbl=$('csr-flow-label');if(lbl)lbl.textContent=CSR_FLOWS[opsState.flow].label;
+  var sb=$('csr-script-box');
+  var rl=$('csr-response-list');
+  var oc=$('csr-outcome');
+  var lg=$('csr-log');
+
+  if(sess.outcome){
+    if(sb)sb.textContent='Call complete.';
+    if(rl)rl.innerHTML='';
+    if(oc){oc.classList.remove('hidden');oc.textContent='Outcome: '+sess.outcome;}
   }else{
-    $('csr-opening').textContent=sess.opening;
-    var flow=CSR_FLOWS[opsState.csrDraft.flow];
-    if(sess.outcome){
-      $('csr-script').textContent='Call complete.';
-      $('csr-response-list').innerHTML='';
-      $('csr-outcome').classList.remove('hidden');
-      $('csr-outcome').textContent='Outcome: '+sess.outcome;
-    }else{
-      var node=flow.nodes[sess.nodeId];
-      $('csr-script').textContent=node.script;
-      $('csr-response-list').innerHTML=node.responses.map(function(r,i){return'<button class="choice-btn" data-csr-response="'+i+'">'+esc(r.label)+'</button>';}).join('');
-      $('csr-outcome').classList.add('hidden');
-    }
-    $('csr-log').innerHTML=sess.log.map(function(e){return'<div class="log-entry"><div class="log-actor">'+esc(e.actor)+'</div><div class="log-text">'+esc(e.text)+'</div></div>';}).join('');
+    var node=CSR_FLOWS[opsState.flow].nodes[sess.nodeId];
+    if(sb)sb.textContent=node.script;
+    if(rl)rl.innerHTML=node.responses.map(function(r,i){return'<button class="choice-btn" data-csr-response="'+i+'">'+r.label+'</button>';}).join('');
+    if(oc)oc.classList.add('hidden');
   }
+  if(lg)lg.innerHTML=sess.log.map(function(e){return'<div class="log-entry"><div class="log-actor">'+e.actor+'</div><div class="log-text">'+e.text+'</div></div>';}).join('');
 }
 
+// ── DISPATCH ──
 function renderDispatch(){
-  $('dispatch-csr').innerHTML=TEAM.csrs.map(function(c){return'<option'+(c===opsState.dispatchDraft.csr?' selected':'')+'>'+c+'</option>';}).join('');
-  $('dispatch-tech').innerHTML=TEAM.techs.map(function(t){return'<option'+(t===opsState.dispatchDraft.tech?' selected':'')+'>'+t+'</option>';}).join('');
-  $('dispatch-customer').value=opsState.dispatchDraft.customer;
-  $('dispatch-eta').value=opsState.dispatchDraft.eta;
-  $('dispatch-address').value=opsState.dispatchDraft.address;
-  $('dispatch-jobtype').innerHTML=JOB_TYPES.map(function(j){return'<option'+(j===opsState.dispatchDraft.jobType?' selected':'')+'>'+j+'</option>';}).join('');
-  $('dispatch-flags').innerHTML=CUSTOMER_FLAGS.map(function(f){return'<button class="choice-btn'+(opsState.dispatchDraft.flags.includes(f.id)?' on-'+f.tone:'')+'" data-dispatch-flag="'+f.id+'">'+esc(f.label)+'</button>';}).join('');
-  $('dispatch-access').value=opsState.dispatchDraft.accessNotes;
-  $('dispatch-office').value=opsState.dispatchDraft.officeNotes;
+  var dt=$('dispatch-tech');if(dt)dt.innerHTML=TEAM.techs.map(function(t){return'<option'+(t===opsState.dispatch.tech?' selected':'')+'>'+t+'</option>';}).join('');
+  var de=$('dispatch-eta');if(de)de.value=opsState.dispatch.eta;
+  var da=$('dispatch-address');if(da)da.value=opsState.dispatch.address;
+  var dj=$('dispatch-jobtype');if(dj)dj.innerHTML=JOB_TYPES.map(function(j){return'<option'+(j===opsState.dispatch.jobType?' selected':'')+'>'+j+'</option>';}).join('');
+  var dn=$('dispatch-notes');if(dn)dn.value=opsState.dispatch.notes;
 }
 
 function renderBriefing(){
   var b=opsState.briefing;
-  if(!b){$('briefing-title').textContent='No briefing yet';$('briefing-sub').textContent='Build one from the Dispatch tab.';$('briefing-status').textContent='Waiting';$('briefing-summary').innerHTML='';$('briefing-flags').innerHTML='';$('briefing-reminders').innerHTML='';$('briefing-access-wrap').classList.add('hidden');$('briefing-office-wrap').classList.add('hidden');return;}
-  $('briefing-title').textContent=b.customer||'Customer';
-  $('briefing-sub').textContent=b.tech+' \u2014 '+b.jobType;
-  $('briefing-status').textContent='Ready';
-  $('briefing-summary').innerHTML=[
-    ['Customer',b.customer||'—'],['Tech',b.tech],['Job Type',b.jobType],['ETA',b.eta+' min'],['Address',b.address||'—']
-  ].map(function(pair){return'<div class="sum-box"><div class="sum-label">'+pair[0]+'</div><div class="sum-val">'+esc(pair[1])+'</div></div>';}).join('');
-  $('briefing-flags').innerHTML=b.flags.length?b.flags.map(function(id){var f=CUSTOMER_FLAGS.find(function(x){return x.id===id;});return f?'<span class="tag '+f.tone+'">'+esc(f.label)+'</span>':'';}).join(''):'<span class="tag slate">No flags</span>';
-  if(b.accessNotes){$('briefing-access').textContent=b.accessNotes;$('briefing-access-wrap').classList.remove('hidden');}
-  else $('briefing-access-wrap').classList.add('hidden');
-  if(b.officeNotes){$('briefing-office').textContent=b.officeNotes;$('briefing-office-wrap').classList.remove('hidden');}
-  else $('briefing-office-wrap').classList.add('hidden');
-  $('briefing-reminders').innerHTML=['Knock, greet by name, present business card.','Review the job card before approaching the door.','Be aware of access notes and customer flags.','No surprises on price — present all 3 options clearly.'].map(function(r){return'<div class="callout">'+r+'</div>';}).join('');
+  var body=$('briefing-body');
+  var title=$('briefing-title');
+  var sub=$('briefing-sub');
+  var status=$('briefing-status');
+  if(!b){
+    if(title)title.textContent='No briefing yet';
+    if(sub)sub.textContent='Go to Dispatch and fill out the job.';
+    if(status)status.textContent='Waiting';
+    if(body)body.innerHTML='<div class="callout" style="color:var(--muted)">Generate a briefing from the Dispatch tab.</div>';
+    return;
+  }
+  if(title)title.textContent=b.tech+' — '+b.jobType;
+  if(sub)sub.textContent='Generated '+new Date(b.createdAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  if(status){status.textContent='Ready';status.className='tag green';}
+  if(body)body.innerHTML=
+    '<div class="sum-grid">'+
+      mkSumBox('Tech',b.tech)+mkSumBox('ETA',b.eta+' min')+mkSumBox('Job Type',b.jobType)+mkSumBox('Address',b.address||'—')+
+    '</div>'+
+    (b.notes?'<div><div class="sum-label">Notes</div><div class="callout">'+esc(b.notes)+'</div></div>':'')+
+    '<div><div class="sum-label">Reminders</div><div class="stack">'+
+      '<div class="callout">Greet by name, present card at the door.</div>'+
+      '<div class="callout">Review job type and notes before approaching.</div>'+
+      '<div class="callout">Present all 3 options clearly — no surprises on price.</div>'+
+    '</div></div>';
 }
+function mkSumBox(l,v){return'<div class="sum-box"><div class="sum-label">'+l+'</div><div class="sum-val">'+esc(v)+'</div></div>';}
 
+// ── DEBRIEF ──
 function renderDebrief(){
-  $('debrief-tech').innerHTML=TEAM.techs.map(function(t){return'<option'+(t===opsState.debriefDraft.tech?' selected':'')+'>'+t+'</option>';}).join('');
-  $('debrief-jobtype').innerHTML=JOB_TYPES.map(function(j){return'<option'+(j===opsState.debriefDraft.jobType?' selected':'')+'>'+j+'</option>';}).join('');
-  $('debrief-customer').value=opsState.debriefDraft.customer;
-  $('debrief-notes').value=opsState.debriefDraft.notes;
-  $('debrief-owner').value=opsState.debriefDraft.followUpOwner;
-  $('debrief-date').value=opsState.debriefDraft.followUpDate;
-  $('debrief-outcome').innerHTML=[{id:'won',label:'Won',tone:'green'},{id:'lost',label:'Lost',tone:'red'}].map(function(item){return'<button class="choice-btn'+(opsState.debriefDraft.outcome===item.id?' '+toneClass(item.tone):'')+'" data-debrief-outcome="'+item.id+'">'+item.label+'</button>';}).join('');
-  $('debrief-objections').innerHTML=DEBRIEF_OBJECTIONS.map(function(item){return'<button class="choice-btn'+(opsState.debriefDraft.objections.includes(item)?' on-amber':'')+'" data-debrief-objection="'+esc(item)+'">'+esc(item)+'</button>';}).join('');
-  $('debrief-agenda').innerHTML=AGENDA_STEPS.map(function(step){return'<div class="score-row"><div class="score-title">'+esc(step)+'</div><div class="choice-grid">'+['yes','partial','no'].map(function(c){return'<button class="choice-btn'+(opsState.debriefDraft.agenda[step]===c?' '+toneClass(c==='yes'?'green':c==='partial'?'amber':'red'):'')+'" data-debrief-agenda-step="'+esc(step)+'" data-debrief-agenda-value="'+c+'">'+(c.charAt(0).toUpperCase()+c.slice(1))+'</button>';}).join('')+'</div></div>';}).join('');
-  var vals=Object.values(opsState.debriefDraft.agenda);
-  var yes=vals.filter(function(v){return v==='yes';}).length,part=vals.filter(function(v){return v==='partial';}).length;
-  var pct=Math.round(((yes+part*0.5)/vals.length)*100);
-  $('debrief-score-sub').textContent='Current adherence: '+pct+'%';
-  $('debrief-summary-left').innerHTML=[['Customer',opsState.debriefDraft.customer||'—'],['Technician',opsState.debriefDraft.tech],['Job type',opsState.debriefDraft.jobType],['Outcome',opsState.debriefDraft.outcome==='won'?'Won job':'Lost / deferred'],['Follow-up',(opsState.debriefDraft.followUpDate?opsState.debriefDraft.followUpOwner+' — '+opsState.debriefDraft.followUpDate:opsState.debriefDraft.followUpOwner+' — no date')]].map(function(pair){return'<div class="sum-box"><div class="sum-label">'+pair[0]+'</div><div class="sum-val">'+esc(pair[1])+'</div></div>';}).join('');
-  $('debrief-summary-objections').innerHTML=opsState.debriefDraft.objections.length?opsState.debriefDraft.objections.map(function(i){return'<span class="tag amber">'+esc(i)+'</span>';}).join(''):'<span class="tag slate">None logged</span>';
-  $('debrief-summary-note').textContent=opsState.debriefDraft.notes.trim()||'No coaching note yet.';
+  var dt=$('debrief-tech');if(dt)dt.innerHTML=TEAM.techs.map(function(t){return'<option'+(t===opsState.debrief.tech?' selected':'')+'>'+t+'</option>';}).join('');
+  var dj=$('debrief-jobtype');if(dj)dj.innerHTML=JOB_TYPES.map(function(j){return'<option'+(j===opsState.debrief.jobType?' selected':'')+'>'+j+'</option>';}).join('');
+  var oc=$('debrief-outcome');
+  if(oc)oc.innerHTML=[{id:'won',label:'✓ Won',cls:'on-green'},{id:'lost',label:'✗ Lost',cls:'on-red'}].map(function(o){return'<button class="choice-btn'+(opsState.debrief.outcome===o.id?' '+o.cls:'')+'" data-debrief-outcome="'+o.id+'">'+o.label+'</button>';}).join('');
+  var dn=$('debrief-notes');if(dn)dn.value=opsState.debrief.notes;
+  var dw=$('debrief-owner');if(dw)dw.value=opsState.debrief.owner;
+  var dd=$('debrief-date');if(dd)dd.value=opsState.debrief.date;
 }
 
 function bindOpsEvents(){
-  $('csr-csr').addEventListener('change',function(e){setState(function(p){return Object.assign({},p,{csrDraft:Object.assign({},p.csrDraft,{csr:e.target.value})});});});
-  $('csr-tech').addEventListener('change',function(e){setState(function(p){return Object.assign({},p,{csrDraft:Object.assign({},p.csrDraft,{tech:e.target.value})});});});
-  $('csr-customer').addEventListener('input',function(e){setState(function(p){return Object.assign({},p,{csrDraft:Object.assign({},p.csrDraft,{customer:e.target.value})});});});
-  $('csr-job').addEventListener('input',function(e){setState(function(p){return Object.assign({},p,{csrDraft:Object.assign({},p.csrDraft,{job:e.target.value})});});});
-  $('csr-flow-buttons').addEventListener('click',function(e){var b=e.target.closest('[data-csr-flow]');if(!b)return;setState(function(p){return Object.assign({},p,{csrDraft:Object.assign({},p.csrDraft,{flow:b.dataset.csrFlow}),csrSession:null});});});
-  $('csr-start-btn').addEventListener('click',function(){
-    if(!opsState.csrDraft.customer.trim()){alert('Enter a customer name first.');return;}
-    var flow=CSR_FLOWS[opsState.csrDraft.flow];
-    var opening=flow.opening({csr:opsState.csrDraft.csr,customer:opsState.csrDraft.customer||'Customer',tech:opsState.csrDraft.tech,job:opsState.csrDraft.job||'recent service'});
-    setState(function(p){return Object.assign({},p,{csrSession:{nodeId:'root',opening:opening,outcome:'',log:[{actor:'CSR',text:opening,tone:'blue'}]}});});
+  var cc=$('csr-csr');if(cc)cc.addEventListener('change',function(e){opsState.csr=e.target.value;renderCSR();});
+  var ct=$('csr-tech');if(ct)ct.addEventListener('change',function(e){opsState.tech=e.target.value;renderCSR();});
+  var fb=$('csr-flow-buttons');
+  if(fb)fb.addEventListener('click',function(e){var b=e.target.closest('[data-csr-flow]');if(!b)return;opsState.flow=b.dataset.csrFlow;opsState.session=null;renderCSR();});
+  var sb=$('csr-start-btn');
+  if(sb)sb.addEventListener('click',function(){
+    var flow=CSR_FLOWS[opsState.flow];
+    var opening=flow.opening({csr:opsState.csr,tech:opsState.tech});
+    opsState.session={nodeId:'root',outcome:'',log:[{actor:'CSR',text:opening}]};
+    renderCSR();
   });
-  $('csr-reset-btn').addEventListener('click',function(){setState(function(p){return Object.assign({},p,{csrSession:null});});});
-  $('csr-response-list').addEventListener('click',function(e){
-    var b=e.target.closest('[data-csr-response]');if(!b)return;
+  var rb=$('csr-reset-btn');if(rb)rb.addEventListener('click',function(){opsState.session=null;renderCSR();});
+  var rl=$('csr-response-list');
+  if(rl)rl.addEventListener('click',function(e){
+    var b=e.target.closest('[data-csr-response]');if(!b||!opsState.session)return;
     var idx=Number(b.dataset.csrResponse);
-    var flow=CSR_FLOWS[opsState.csrDraft.flow];
-    var node=flow.nodes[opsState.csrSession.nodeId];
+    var node=CSR_FLOWS[opsState.flow].nodes[opsState.session.nodeId];
     var resp=node.responses[idx];
-    setState(function(p){
-      var nextLog=[].concat(p.csrSession.log,[{actor:'Customer',text:resp.label,tone:resp.mood}]);
-      if(resp.next){
-        var nextNode=CSR_FLOWS[p.csrDraft.flow].nodes[resp.next];
-        return Object.assign({},p,{csrSession:Object.assign({},p.csrSession,{nodeId:resp.next,outcome:'',log:nextLog.concat([{actor:'System',text:nextNode.script,tone:'slate'}])})});
-      }
-      return Object.assign({},p,{csrSession:Object.assign({},p.csrSession,{outcome:resp.outcome||'Call logged',log:nextLog.concat([{actor:'System',text:'Outcome: '+(resp.outcome||'Call logged'),tone:resp.mood}])})});
-    });
+    opsState.session.log.push({actor:'Customer',text:resp.label});
+    if(resp.next){
+      var nextNode=CSR_FLOWS[opsState.flow].nodes[resp.next];
+      opsState.session.nodeId=resp.next;
+      opsState.session.log.push({actor:'Guide',text:nextNode.script});
+    }else{
+      opsState.session.outcome=resp.outcome||'Call complete';
+      opsState.session.log.push({actor:'Outcome',text:resp.outcome||'Call complete'});
+    }
+    renderCSR();
   });
 
-  $('dispatch-csr').addEventListener('change',function(e){setState(function(p){return Object.assign({},p,{dispatchDraft:Object.assign({},p.dispatchDraft,{csr:e.target.value})});});});
-  $('dispatch-tech').addEventListener('change',function(e){setState(function(p){return Object.assign({},p,{dispatchDraft:Object.assign({},p.dispatchDraft,{tech:e.target.value})});});});
-  $('dispatch-customer').addEventListener('input',function(e){setState(function(p){return Object.assign({},p,{dispatchDraft:Object.assign({},p.dispatchDraft,{customer:e.target.value})});});});
-  $('dispatch-eta').addEventListener('input',function(e){setState(function(p){return Object.assign({},p,{dispatchDraft:Object.assign({},p.dispatchDraft,{eta:Number(e.target.value)||0})});});});
-  $('dispatch-address').addEventListener('input',function(e){setState(function(p){return Object.assign({},p,{dispatchDraft:Object.assign({},p.dispatchDraft,{address:e.target.value})});});});
-  $('dispatch-jobtype').addEventListener('change',function(e){setState(function(p){return Object.assign({},p,{dispatchDraft:Object.assign({},p.dispatchDraft,{jobType:e.target.value})});});});
-  $('dispatch-access').addEventListener('input',function(e){setState(function(p){return Object.assign({},p,{dispatchDraft:Object.assign({},p.dispatchDraft,{accessNotes:e.target.value})});});});
-  $('dispatch-office').addEventListener('input',function(e){setState(function(p){return Object.assign({},p,{dispatchDraft:Object.assign({},p.dispatchDraft,{officeNotes:e.target.value})});});});
-  $('dispatch-flags').addEventListener('click',function(e){var b=e.target.closest('[data-dispatch-flag]');if(!b)return;var id=b.dataset.dispatchFlag;setState(function(p){var ex=p.dispatchDraft.flags.includes(id);return Object.assign({},p,{dispatchDraft:Object.assign({},p.dispatchDraft,{flags:ex?p.dispatchDraft.flags.filter(function(x){return x!==id;}):[].concat(p.dispatchDraft.flags,[id])})});});});
-  $('dispatch-generate-btn').addEventListener('click',function(){
-    var d=opsState.dispatchDraft;
-    if(!d.customer.trim()||!d.address.trim()){alert('Enter a customer name and address first.');return;}
-    setState(function(p){return Object.assign({},p,{briefing:Object.assign({createdAt:new Date().toISOString()},p.dispatchDraft),activeModule:'briefing'});});
+  // dispatch
+  var dtech=$('dispatch-tech');if(dtech)dtech.addEventListener('change',function(e){opsState.dispatch.tech=e.target.value;});
+  var deta=$('dispatch-eta');if(deta)deta.addEventListener('input',function(e){opsState.dispatch.eta=Number(e.target.value)||0;});
+  var daddr=$('dispatch-address');if(daddr)daddr.addEventListener('input',function(e){opsState.dispatch.address=e.target.value;});
+  var djob=$('dispatch-jobtype');if(djob)djob.addEventListener('change',function(e){opsState.dispatch.jobType=e.target.value;});
+  var dnotes=$('dispatch-notes');if(dnotes)dnotes.addEventListener('input',function(e){opsState.dispatch.notes=e.target.value;});
+  var dgen=$('dispatch-generate-btn');
+  if(dgen)dgen.addEventListener('click',function(){
+    if(!opsState.dispatch.address.trim()){alert('Enter an address first.');return;}
+    opsState.briefing={createdAt:new Date().toISOString(),tech:opsState.dispatch.tech,eta:opsState.dispatch.eta,address:opsState.dispatch.address,jobType:opsState.dispatch.jobType,notes:opsState.dispatch.notes};
+    renderBriefing();
     goTab('briefing');
   });
 
-  $('debrief-customer').addEventListener('input',function(e){setState(function(p){return Object.assign({},p,{debriefDraft:Object.assign({},p.debriefDraft,{customer:e.target.value})});});});
-  $('debrief-tech').addEventListener('change',function(e){setState(function(p){return Object.assign({},p,{debriefDraft:Object.assign({},p.debriefDraft,{tech:e.target.value})});});});
-  $('debrief-jobtype').addEventListener('change',function(e){setState(function(p){return Object.assign({},p,{debriefDraft:Object.assign({},p.debriefDraft,{jobType:e.target.value})});});});
-  $('debrief-notes').addEventListener('input',function(e){setState(function(p){return Object.assign({},p,{debriefDraft:Object.assign({},p.debriefDraft,{notes:e.target.value})});});});
-  $('debrief-owner').addEventListener('input',function(e){setState(function(p){return Object.assign({},p,{debriefDraft:Object.assign({},p.debriefDraft,{followUpOwner:e.target.value})});});});
-  $('debrief-date').addEventListener('input',function(e){setState(function(p){return Object.assign({},p,{debriefDraft:Object.assign({},p.debriefDraft,{followUpDate:e.target.value})});});});
-  $('debrief-outcome').addEventListener('click',function(e){var b=e.target.closest('[data-debrief-outcome]');if(!b)return;setState(function(p){return Object.assign({},p,{debriefDraft:Object.assign({},p.debriefDraft,{outcome:b.dataset.debriefOutcome})});});});
-  $('debrief-objections').addEventListener('click',function(e){var b=e.target.closest('[data-debrief-objection]');if(!b)return;var val=b.textContent;setState(function(p){var ex=p.debriefDraft.objections.includes(val);return Object.assign({},p,{debriefDraft:Object.assign({},p.debriefDraft,{objections:ex?p.debriefDraft.objections.filter(function(x){return x!==val;}):[].concat(p.debriefDraft.objections,[val])})});});});
-  $('debrief-agenda').addEventListener('click',function(e){var b=e.target.closest('[data-debrief-agenda-step]');if(!b)return;var step=b.dataset.debriefAgendaStep,val=b.dataset.debriefAgendaValue;setState(function(p){return Object.assign({},p,{debriefDraft:Object.assign({},p.debriefDraft,{agenda:Object.assign({},p.debriefDraft.agenda,{[step]:val})})});});});
+  // debrief
+  var dbtech=$('debrief-tech');if(dbtech)dbtech.addEventListener('change',function(e){opsState.debrief.tech=e.target.value;renderDebrief();});
+  var dbjob=$('debrief-jobtype');if(dbjob)dbjob.addEventListener('change',function(e){opsState.debrief.jobType=e.target.value;renderDebrief();});
+  var dboc=$('debrief-outcome');if(dboc)dboc.addEventListener('click',function(e){var b=e.target.closest('[data-debrief-outcome]');if(!b)return;opsState.debrief.outcome=b.dataset.debriefOutcome;renderDebrief();});
+  var dbnotes=$('debrief-notes');if(dbnotes)dbnotes.addEventListener('input',function(e){opsState.debrief.notes=e.target.value;});
+  var dbowner=$('debrief-owner');if(dbowner)dbowner.addEventListener('input',function(e){opsState.debrief.owner=e.target.value;});
+  var dbdate=$('debrief-date');if(dbdate)dbdate.addEventListener('input',function(e){opsState.debrief.date=e.target.value;});
+  var dbsave=$('debrief-save-btn');
+  if(dbsave)dbsave.addEventListener('click',function(){
+    var saved=$('debrief-saved');
+    if(saved){saved.classList.remove('hidden');setTimeout(function(){saved.classList.add('hidden');},2500);}
+  });
 }
 
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function $(id){return document.getElementById(id);}
 // ═══════════════════════
 // THEME
 // ═══════════════════════
