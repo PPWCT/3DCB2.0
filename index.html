@@ -18,74 +18,126 @@
   --r:4px; --rl:8px;
 }
 
+/* ── SOOTHING BACKGROUND ANIMATIONS ── */
+@keyframes darkPulse {
+  0%   { background-position: 0% 50% }
+  50%  { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+}
+@keyframes lightPulse {
+  0%   { background-position: 0% 50% }
+  50%  { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+}
+@keyframes funPulse {
+  0%   { background-position: 0% 50% }
+  50%  { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+}
+@keyframes sparkle {
+  0%,100% { opacity:.4; transform:scale(.85) rotate(0deg) }
+  50%      { opacity:1;  transform:scale(1.15) rotate(180deg) }
+}
+
+/* ── DARK MODE (default) ── */
+body {
+  background: linear-gradient(135deg, #0A0A0F, #111827, #0F0F1A, #0D1117, #0A0A0F);
+  background-size: 400% 400%;
+  animation: darkPulse 18s ease infinite;
+}
+
 /* ── LIGHT MODE ── */
 body.light {
   --blue:#2D7DD2; --blue-dim:rgba(45,125,210,.1); --blue-mid:rgba(45,125,210,.35);
-  --surface:#F0EEE9; --surface-r:#E8E5DF; --surface-c:#FFFFFF;
-  --border:rgba(45,125,210,.12); --border-s:rgba(45,125,210,.3);
+  --surface:#F5F2ED; --surface-r:#EDE8E0; --surface-c:#FFFFFF;
+  --border:rgba(45,125,210,.12); --border-s:rgba(45,125,210,.28);
   --text:#1A1A1A; --text-2:#5A5855; --text-d:#9A9794;
   --green:#2E7D52; --amber:#B07D10; --red:#C0392B;
+  background: linear-gradient(135deg, #EAE4D9, #F5F0E8, #E8F0F5, #F0EBE3, #EDE7DB);
+  background-size: 400% 400%;
+  animation: lightPulse 18s ease infinite;
 }
-body.light .header::after{background:linear-gradient(90deg,transparent,var(--blue),transparent)}
-body.light .lcard{box-shadow:0 8px 40px rgba(0,0,0,.12)}
-body.light .acell{box-shadow:0 1px 3px rgba(0,0,0,.06)}
-body.light .token.s{background:rgba(45,125,210,.1);border-color:rgba(45,125,210,.4)}
-body.light .modal{box-shadow:0 8px 40px rgba(0,0,0,.15)}
-body.light .drawer{box-shadow:-4px 0 24px rgba(0,0,0,.1)}
+body.light .header::after { background:linear-gradient(90deg,transparent,var(--blue),transparent) }
+body.light .lcard         { box-shadow:0 8px 40px rgba(0,0,0,.1) }
+body.light .acell         { box-shadow:0 1px 4px rgba(0,0,0,.07) }
+body.light .modal         { box-shadow:0 8px 40px rgba(0,0,0,.12) }
+body.light .drawer        { box-shadow:-4px 0 24px rgba(0,0,0,.08) }
+body.light .token.s       { background:rgba(45,125,210,.1); border-color:rgba(45,125,210,.4) }
+body.light .metrics       { background:rgba(0,0,0,.04) }
+body.light .nav-bar       { background:rgba(255,255,255,.6); backdrop-filter:blur(8px) }
+body.light .footer        { background:rgba(237,232,224,.8) }
 
 /* ── FUN MODE ✨ ── */
 body.fun {
-  --blue:#E91E8C; --blue-dim:rgba(233,30,140,.1); --blue-mid:rgba(233,30,140,.35);
-  --surface:#1A0A2E; --surface-r:#22103D; --surface-c:#2D1554;
-  --border:rgba(233,30,140,.15); --border-s:rgba(233,30,140,.4);
-  --text:#FFE8F5; --text-2:#C9A0C0; --text-d:#8A6080;
+  --blue:#E91E8C; --blue-dim:rgba(233,30,140,.1); --blue-mid:rgba(233,30,140,.38);
+  --surface:#1A0530; --surface-r:#240840; --surface-c:#2E0F52;
+  --border:rgba(233,30,140,.18); --border-s:rgba(233,30,140,.45);
+  --text:#FFE8F8; --text-2:#D4A0CC; --text-d:#8A6080;
   --green:#A8E063; --amber:#FFD700; --red:#FF6B9D;
-  --r:12px; --rl:16px;
+  --r:12px; --rl:18px;
+  background: linear-gradient(135deg, #1A0530, #2D0A50, #3D1060, #1F0840, #150428, #2A0848, #1A0530);
+  background-size: 400% 400%;
+  animation: funPulse 12s ease infinite;
 }
-body.fun *{font-family:'Barlow Condensed',sans-serif!important}
-body.fun body{background:linear-gradient(135deg,#1A0A2E 0%,#2D1554 50%,#1A0A2E 100%)}
-body.fun .header{background:linear-gradient(90deg,#2D1554,#3D1A6E);border-bottom-color:rgba(233,30,140,.3)}
-body.fun .header::after{background:linear-gradient(90deg,transparent,#FF69B4,#E91E8C,#FF69B4,transparent);opacity:.8}
-body.fun .bname{background:linear-gradient(90deg,#FF69B4,#E91E8C,#C471ED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-body.fun .metrics{background:rgba(233,30,140,.2)}
-body.fun .metric{background:rgba(45,15,80,.8)}
-body.fun .nav-bar{background:linear-gradient(90deg,#22103D,#2D1554)}
-body.fun .acell{border-radius:16px;border-color:rgba(233,30,140,.2)}
-body.fun .acell.next{border-color:rgba(233,30,140,.5);box-shadow:0 0 12px rgba(233,30,140,.15)}
-body.fun .lcard{background:linear-gradient(135deg,#2D1554,#3D1A6E);border-color:rgba(233,30,140,.5)}
-body.fun .llogo{background:linear-gradient(90deg,#FF69B4,#E91E8C,#C471ED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-body.fun .modal{background:linear-gradient(135deg,#2D1554,#3D1A6E);border-radius:20px}
-body.fun .drawer{background:linear-gradient(180deg,#2D1554,#1A0A2E)}
-body.fun .token{border-radius:50%}
-body.fun .token.s{background:rgba(233,30,140,.2);border-color:rgba(233,30,140,.6)}
-body.fun .token.c{background:rgba(168,224,99,.2);border-color:rgba(168,224,99,.6)}
-body.fun .token.p{background:rgba(255,215,0,.2);border-color:rgba(255,215,0,.5)}
-body.fun .token.x{background:rgba(255,107,157,.15);border-color:rgba(255,107,157,.4)}
-body.fun .add-btn{border-color:rgba(233,30,140,.4);border-style:dashed}
-body.fun .add-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-dim);box-shadow:0 0 10px rgba(233,30,140,.3)}
-body.fun .nav-btn{border-radius:50%}
-body.fun .nav-today{border-radius:20px;background:linear-gradient(90deg,rgba(233,30,140,.2),rgba(196,113,237,.2));border-color:rgba(233,30,140,.5)}
-body.fun .goals-btn{border-radius:20px}
-body.fun .hbtn{border-radius:20px}
-body.fun .btn{border-radius:20px}
-body.fun .bsave{background:linear-gradient(90deg,#E91E8C,#C471ED)}
-body.fun .fi{border-radius:10px}
-body.fun .uchip{border-radius:20px;border-color:rgba(233,30,140,.3)}
-body.fun .tech-lbl{color:#FF9DDB}
-body.fun .tech-lbl.out{color:#FF6B9D}
-body.fun .gbar-fill{background:linear-gradient(90deg,#E91E8C,#C471ED)}
-body.fun .ldot{background:#FF69B4;box-shadow:0 0 6px #FF69B4}
-body.fun #appShell::before{content:'✨';position:fixed;top:10px;right:60px;font-size:1.2em;opacity:.4;pointer-events:none;z-index:1}
-
-/* sparkle animation for fun mode */
-@keyframes sparkle{0%,100%{opacity:.3;transform:scale(.8) rotate(0deg)}50%{opacity:1;transform:scale(1.2) rotate(180deg)}}
-body.fun .ldot{animation:sparkle 1.5s ease-in-out infinite}
+body.fun .header {
+  background: linear-gradient(90deg, rgba(46,15,82,.95), rgba(61,16,96,.95));
+  border-bottom-color: rgba(233,30,140,.3);
+  backdrop-filter: blur(10px);
+}
+body.fun .header::after {
+  background: linear-gradient(90deg, transparent, #FF69B4, #E91E8C, #C471ED, #FF69B4, transparent);
+  opacity: .9;
+}
+body.fun .bname {
+  background: linear-gradient(90deg,#FF9DDB,#E91E8C,#C471ED,#FF9DDB);
+  background-size: 200%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  animation: funPulse 4s ease infinite;
+}
+body.fun .metrics        { background: rgba(233,30,140,.15); gap:2px }
+body.fun .metric         { background: rgba(30,5,55,.85); backdrop-filter:blur(6px) }
+body.fun .nav-bar        { background: rgba(36,8,64,.9); backdrop-filter:blur(8px); border-bottom-color:rgba(233,30,140,.2) }
+body.fun .footer         { background: rgba(26,5,48,.9); border-top-color:rgba(233,30,140,.2) }
+body.fun .acell          { border-radius:18px; border-color:rgba(233,30,140,.18); background:rgba(46,15,82,.7); backdrop-filter:blur(4px) }
+body.fun .acell:hover    { border-color:rgba(233,30,140,.45) }
+body.fun .acell.next     { border-color:rgba(233,30,140,.55); box-shadow:0 0 16px rgba(233,30,140,.18) }
+body.fun .lcard          { background:linear-gradient(135deg,rgba(46,15,82,.98),rgba(61,16,96,.98)); border-color:rgba(233,30,140,.5); box-shadow:0 0 60px rgba(233,30,140,.2) }
+body.fun .lcard::before  { opacity:.9 }
+body.fun .llogo          { background:linear-gradient(90deg,#FF9DDB,#E91E8C,#C471ED); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text }
+body.fun .modal          { background:linear-gradient(135deg,rgba(46,15,82,.98),rgba(61,16,96,.98)); border-radius:22px; border-color:rgba(233,30,140,.4) }
+body.fun .drawer         { background:linear-gradient(180deg,rgba(36,8,64,.98),rgba(26,5,48,.98)) }
+body.fun .token          { border-radius:50% }
+body.fun .token.s        { background:rgba(233,30,140,.2); border-color:rgba(233,30,140,.65) }
+body.fun .token.c        { background:rgba(168,224,99,.2); border-color:rgba(168,224,99,.6) }
+body.fun .token.p        { background:rgba(255,215,0,.2);  border-color:rgba(255,215,0,.55) }
+body.fun .token.x        { background:rgba(255,107,157,.15);border-color:rgba(255,107,157,.45) }
+body.fun .add-btn        { border-color:rgba(233,30,140,.35); border-style:dashed }
+body.fun .add-btn:hover  { border-color:#E91E8C; box-shadow:0 0 10px rgba(233,30,140,.35) }
+body.fun .nav-btn        { border-radius:50%; border-color:rgba(233,30,140,.3) }
+body.fun .nav-today      { border-radius:20px; background:linear-gradient(90deg,rgba(233,30,140,.25),rgba(196,113,237,.25)); border-color:rgba(233,30,140,.5) }
+body.fun .goals-btn, body.fun .hbtn { border-radius:20px }
+body.fun .btn            { border-radius:20px }
+body.fun .bsave          { background:linear-gradient(90deg,#E91E8C,#C471ED) }
+body.fun .fi             { border-radius:10px; background:rgba(26,5,48,.6) }
+body.fun .uchip          { border-radius:20px; border-color:rgba(233,30,140,.35) }
+body.fun .tech-lbl       { color:#FF9DDB }
+body.fun .tech-lbl.out   { color:#FF6B9D }
+body.fun .gbar-fill      { background:linear-gradient(90deg,#E91E8C,#C471ED) }
+body.fun .ldot           { background:#FF69B4; box-shadow:0 0 8px #FF69B4; animation:sparkle 1.8s ease-in-out infinite }
+body.fun .mval.b         { color:#FF9DDB }
+body.fun .gcnt           { color:#FF9DDB }
+body.fun .col-date.tomorrow { color:#FF9DDB }
+body.fun .day-x:hover    { background:rgba(233,30,140,.2); border-color:#E91E8C; color:#E91E8C }
+body.fun .day-x.active   { background:rgba(233,30,140,.2); border-color:rgba(233,30,140,.5); color:#E91E8C }
+body.fun .surface-r      { background:rgba(36,8,64,.9) }
+body.fun .hday-hdr       { color:#FF9DDB }
+body.fun .col-eyebrow    { color:#8A6080 }
 
 /* THEME TOGGLE BUTTON */
-.theme-btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82em;letter-spacing:.08em;text-transform:uppercase;background:var(--surface-c);border:1px solid var(--border-s);color:var(--text-2);padding:5px 11px;border-radius:var(--r);cursor:pointer;transition:all .2s;white-space:nowrap}
-.theme-btn:hover{border-color:var(--blue-mid);color:var(--blue)}
-body.fun .theme-btn{border-radius:20px;border-color:rgba(233,30,140,.4);color:#FF9DDB}
-body.fun .theme-btn:hover{border-color:#E91E8C;box-shadow:0 0 8px rgba(233,30,140,.3)}
+.theme-btn { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:.82em; letter-spacing:.08em; text-transform:uppercase; background:var(--surface-c); border:1px solid var(--border-s); color:var(--text-2); padding:5px 11px; border-radius:var(--r); cursor:pointer; transition:all .2s; white-space:nowrap }
+.theme-btn:hover { border-color:var(--blue-mid); color:var(--blue) }
+body.fun .theme-btn { border-radius:20px; border-color:rgba(233,30,140,.4); color:#FF9DDB }
+body.fun .theme-btn:hover { border-color:#E91E8C; box-shadow:0 0 10px rgba(233,30,140,.25) }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:15px}
 body{font-family:'Barlow',sans-serif;background:var(--surface);color:var(--text);min-height:100vh;overflow-x:hidden}
