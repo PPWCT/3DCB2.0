@@ -17,6 +17,75 @@
   --green:#52C278; --amber:#F2C255; --red:#E74C3C;
   --r:4px; --rl:8px;
 }
+
+/* ── LIGHT MODE ── */
+body.light {
+  --blue:#2D7DD2; --blue-dim:rgba(45,125,210,.1); --blue-mid:rgba(45,125,210,.35);
+  --surface:#F0EEE9; --surface-r:#E8E5DF; --surface-c:#FFFFFF;
+  --border:rgba(45,125,210,.12); --border-s:rgba(45,125,210,.3);
+  --text:#1A1A1A; --text-2:#5A5855; --text-d:#9A9794;
+  --green:#2E7D52; --amber:#B07D10; --red:#C0392B;
+}
+body.light .header::after{background:linear-gradient(90deg,transparent,var(--blue),transparent)}
+body.light .lcard{box-shadow:0 8px 40px rgba(0,0,0,.12)}
+body.light .acell{box-shadow:0 1px 3px rgba(0,0,0,.06)}
+body.light .token.s{background:rgba(45,125,210,.1);border-color:rgba(45,125,210,.4)}
+body.light .modal{box-shadow:0 8px 40px rgba(0,0,0,.15)}
+body.light .drawer{box-shadow:-4px 0 24px rgba(0,0,0,.1)}
+
+/* ── FUN MODE ✨ ── */
+body.fun {
+  --blue:#E91E8C; --blue-dim:rgba(233,30,140,.1); --blue-mid:rgba(233,30,140,.35);
+  --surface:#1A0A2E; --surface-r:#22103D; --surface-c:#2D1554;
+  --border:rgba(233,30,140,.15); --border-s:rgba(233,30,140,.4);
+  --text:#FFE8F5; --text-2:#C9A0C0; --text-d:#8A6080;
+  --green:#A8E063; --amber:#FFD700; --red:#FF6B9D;
+  --r:12px; --rl:16px;
+}
+body.fun *{font-family:'Barlow Condensed',sans-serif!important}
+body.fun body{background:linear-gradient(135deg,#1A0A2E 0%,#2D1554 50%,#1A0A2E 100%)}
+body.fun .header{background:linear-gradient(90deg,#2D1554,#3D1A6E);border-bottom-color:rgba(233,30,140,.3)}
+body.fun .header::after{background:linear-gradient(90deg,transparent,#FF69B4,#E91E8C,#FF69B4,transparent);opacity:.8}
+body.fun .bname{background:linear-gradient(90deg,#FF69B4,#E91E8C,#C471ED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+body.fun .metrics{background:rgba(233,30,140,.2)}
+body.fun .metric{background:rgba(45,15,80,.8)}
+body.fun .nav-bar{background:linear-gradient(90deg,#22103D,#2D1554)}
+body.fun .acell{border-radius:16px;border-color:rgba(233,30,140,.2)}
+body.fun .acell.next{border-color:rgba(233,30,140,.5);box-shadow:0 0 12px rgba(233,30,140,.15)}
+body.fun .lcard{background:linear-gradient(135deg,#2D1554,#3D1A6E);border-color:rgba(233,30,140,.5)}
+body.fun .llogo{background:linear-gradient(90deg,#FF69B4,#E91E8C,#C471ED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+body.fun .modal{background:linear-gradient(135deg,#2D1554,#3D1A6E);border-radius:20px}
+body.fun .drawer{background:linear-gradient(180deg,#2D1554,#1A0A2E)}
+body.fun .token{border-radius:50%}
+body.fun .token.s{background:rgba(233,30,140,.2);border-color:rgba(233,30,140,.6)}
+body.fun .token.c{background:rgba(168,224,99,.2);border-color:rgba(168,224,99,.6)}
+body.fun .token.p{background:rgba(255,215,0,.2);border-color:rgba(255,215,0,.5)}
+body.fun .token.x{background:rgba(255,107,157,.15);border-color:rgba(255,107,157,.4)}
+body.fun .add-btn{border-color:rgba(233,30,140,.4);border-style:dashed}
+body.fun .add-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-dim);box-shadow:0 0 10px rgba(233,30,140,.3)}
+body.fun .nav-btn{border-radius:50%}
+body.fun .nav-today{border-radius:20px;background:linear-gradient(90deg,rgba(233,30,140,.2),rgba(196,113,237,.2));border-color:rgba(233,30,140,.5)}
+body.fun .goals-btn{border-radius:20px}
+body.fun .hbtn{border-radius:20px}
+body.fun .btn{border-radius:20px}
+body.fun .bsave{background:linear-gradient(90deg,#E91E8C,#C471ED)}
+body.fun .fi{border-radius:10px}
+body.fun .uchip{border-radius:20px;border-color:rgba(233,30,140,.3)}
+body.fun .tech-lbl{color:#FF9DDB}
+body.fun .tech-lbl.out{color:#FF6B9D}
+body.fun .gbar-fill{background:linear-gradient(90deg,#E91E8C,#C471ED)}
+body.fun .ldot{background:#FF69B4;box-shadow:0 0 6px #FF69B4}
+body.fun #appShell::before{content:'✨';position:fixed;top:10px;right:60px;font-size:1.2em;opacity:.4;pointer-events:none;z-index:1}
+
+/* sparkle animation for fun mode */
+@keyframes sparkle{0%,100%{opacity:.3;transform:scale(.8) rotate(0deg)}50%{opacity:1;transform:scale(1.2) rotate(180deg)}}
+body.fun .ldot{animation:sparkle 1.5s ease-in-out infinite}
+
+/* THEME TOGGLE BUTTON */
+.theme-btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82em;letter-spacing:.08em;text-transform:uppercase;background:var(--surface-c);border:1px solid var(--border-s);color:var(--text-2);padding:5px 11px;border-radius:var(--r);cursor:pointer;transition:all .2s;white-space:nowrap}
+.theme-btn:hover{border-color:var(--blue-mid);color:var(--blue)}
+body.fun .theme-btn{border-radius:20px;border-color:rgba(233,30,140,.4);color:#FF9DDB}
+body.fun .theme-btn:hover{border-color:#E91E8C;box-shadow:0 0 8px rgba(233,30,140,.3)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:15px}
 body{font-family:'Barlow',sans-serif;background:var(--surface);color:var(--text);min-height:100vh;overflow-x:hidden}
@@ -110,11 +179,17 @@ body{font-family:'Barlow',sans-serif;background:var(--surface);color:var(--text)
 .tech-lbl:hover{border-color:var(--border-s);background:var(--surface-c)}
 .tech-lbl.out{color:var(--red);text-decoration:line-through;opacity:.5}
 .tech-lbl.out:hover{border-color:rgba(231,76,60,.3);background:rgba(231,76,60,.08)}
-.acell{background:var(--surface-c);border:1px solid var(--border);border-radius:var(--rl);padding:9px 9px 7px;min-height:80px;transition:border-color .2s,opacity .2s}
+.acell{background:var(--surface-c);border:1px solid var(--border);border-radius:var(--rl);padding:9px 9px 7px;min-height:80px;transition:border-color .2s,opacity .2s;position:relative}
 .acell:hover{border-color:var(--border-s)}
 .acell.next{border-color:rgba(142,190,239,.22)}
 .acell.past{opacity:.55;pointer-events:none}
 .acell.tech-out{opacity:.3;pointer-events:none;background:repeating-linear-gradient(135deg,var(--surface-c),var(--surface-c) 6px,rgba(231,76,60,.04) 6px,rgba(231,76,60,.04) 12px)}
+.acell.day-out{opacity:.35;background:repeating-linear-gradient(135deg,var(--surface-c),var(--surface-c) 6px,rgba(231,76,60,.06) 6px,rgba(231,76,60,.06) 12px);border-color:rgba(231,76,60,.25)}
+.acell.day-out .trow{pointer-events:none}
+.day-x{position:absolute;top:5px;right:5px;width:18px;height:18px;border-radius:50%;background:transparent;border:1px solid var(--border-s);color:var(--text-d);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.6em;font-weight:800;font-family:'Barlow Condensed',sans-serif;transition:all .2s;opacity:0;z-index:5}
+.acell:hover .day-x{opacity:1}
+.day-x:hover{background:rgba(231,76,60,.15);border-color:var(--red);color:var(--red)}
+.day-x.active{opacity:1;background:rgba(231,76,60,.15);border-color:rgba(231,76,60,.4);color:var(--red)}
 .trow{display:flex;flex-wrap:wrap;gap:4px;min-height:42px;align-content:flex-start}
 .token{position:relative;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s,box-shadow .15s;flex-shrink:0;border:1.5px solid transparent;user-select:none}
 .token:hover{transform:scale(1.13);box-shadow:0 4px 16px rgba(0,0,0,.5);z-index:2}
@@ -233,6 +308,7 @@ select.fi option{background:var(--surface-c)}
       <span class="sync" id="syncSt"></span>
       <div class="uchip"><div class="uav" id="uAv">—</div><span class="uname" id="uNm">—</span></div>
       <button class="hbtn" onclick="openDrawer()">&#x229E; History</button>
+      <button class="theme-btn" id="themeBtn" onclick="cycleTheme()">&#9788; Light</button>
       <button class="hbtn danger" onclick="signOut()">Sign Out</button>
     </div>
   </div>
@@ -357,7 +433,14 @@ var FB_CONFIG = {
 var SESSION_HOURS = 10;
 var TECHS = ['Anthony','Joe','Tyler','Zach','Shea'];
 var DEF_GOALS = [12,8,4];
-var SESS_KEY = 'ppw_sess_v2';
+var SESS_KEY  = 'ppw_sess_v2';
+var THEME_KEY = 'ppw_theme_v1';
+
+// Apply saved theme immediately
+(function(){
+  var t = localStorage.getItem(THEME_KEY)||'dark';
+  applyTheme(t);
+})();
 var GOAL_KEY = 'ppw_goals_v1';
 
 // ═══════════════════════════
@@ -375,6 +458,7 @@ var todayKey = '';
 var anchorDate = nextBizDayFrom(new Date()); // starts on NEXT business day
 var goals = loadGoals();
 var outTechs = {};        // tech name -> true if crossed out
+var outDays  = {};        // "tech:dateStr" -> true if that specific day crossed out
 var editGoals = false;
 var calOpen = false;
 var calView = new Date();
@@ -470,9 +554,8 @@ function startListeners() {
           goals = cache[ds]._goals;
           saveGoalsLocal();
         }
-        if(cache[ds]._out) {
-          outTechs = cache[ds]._out;
-        }
+        if(cache[ds]._out) outTechs = cache[ds]._out;
+        if(cache[ds]._outdays) outDays = cache[ds]._outdays;
       } else {
         cache[ds] = {};
       }
@@ -497,6 +580,7 @@ function flushDay(ds) {
   });
   payload._goals = goals;
   payload._out = outTechs;
+  payload._outdays = outDays;
   db.collection('callboard').doc(ds).set(payload)
     .then(function(){ setSyncSt('saved'); })
     .catch(function(e){ console.error(e); setSyncSt('err'); });
@@ -723,6 +807,14 @@ function toggleTech(tech) {
   renderBoard();
 }
 
+function toggleDay(tech, ds, e) {
+  e.stopPropagation();
+  var key = tech+':'+ds;
+  outDays[key] = !outDays[key];
+  scheduleSave(ds);
+  renderBoard();
+}
+
 function renderGrid(){
   var grid=document.getElementById('boardGrid');
   grid.innerHTML='';
@@ -733,7 +825,7 @@ function renderGrid(){
     var lbl=document.createElement('span');
     lbl.className='tech-lbl'+(isOut?' out':'');
     lbl.textContent=tech;
-    lbl.title=isOut?'Click to restore '+tech:'Click to mark '+tech+' unavailable';
+    lbl.title=isOut?'Click to restore '+tech:'Click to mark '+tech+' unavailable all 3 days';
     lbl.onclick=(function(t){return function(){toggleTech(t);};})(tech);
     tc.appendChild(lbl);
     grid.appendChild(tc);
@@ -741,11 +833,24 @@ function renderGrid(){
       var ds=dateKey(d);
       var isPast=ds<todayKey;
       var isNext=ds===dateKey(nextBizDayFrom(new Date()));
+      var dayKey=tech+':'+ds;
+      var isDayOut=!!outDays[dayKey];
       var cell=document.createElement('div');
-      cell.className='acell'+(isNext?' next':'')+(isPast?' past':'')+(isOut?' tech-out':'');
+      cell.className='acell'+(isNext?' next':'')+(isPast?' past':'')+(isOut?' tech-out':isDayOut?' day-out':'');
+
+      // Per-day X button (only on non-past, non-full-out cells)
+      if(!isPast && !isOut){
+        var dx=document.createElement('button');
+        dx.className='day-x'+(isDayOut?' active':'');
+        dx.innerHTML='&#x2715;';
+        dx.title=isDayOut?'Restore this day':'Mark this day unavailable';
+        dx.onclick=(function(t,s){return function(e){toggleDay(t,s,e);};})(tech,ds);
+        cell.appendChild(dx);
+      }
+
       var row=document.createElement('div');
       row.className='trow';
-      if(!isOut){
+      if(!isOut && !isDayOut){
         getAppts(ds,tech).forEach(function(a){ row.appendChild(mkToken(a,tech,ds)); });
         if(!isPast){
           var btn=document.createElement('button');
@@ -924,6 +1029,29 @@ function delAppt(){
   scheduleSave(ds);
   closeModal();
   renderBoard();
+}
+
+// ═══════════════════════════
+// THEME
+// ═══════════════════════════
+var THEMES = ['dark','light','fun'];
+var THEME_ICONS  = {dark:'☀️ Light', light:'✨ Fun', fun:'🌑 Dark'};
+var currentTheme = localStorage.getItem(THEME_KEY)||'dark';
+
+function applyTheme(t) {
+  document.body.classList.remove('light','fun');
+  if(t==='light') document.body.classList.add('light');
+  if(t==='fun')   document.body.classList.add('fun');
+  currentTheme = t;
+  var btn = document.getElementById('themeBtn');
+  if(btn) btn.innerHTML = THEME_ICONS[t];
+}
+
+function cycleTheme() {
+  var idx = (THEMES.indexOf(currentTheme)+1) % THEMES.length;
+  var next = THEMES[idx];
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
 }
 </script>
 </body>
