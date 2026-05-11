@@ -508,7 +508,6 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
       </div>
       <button class="tb-btn danger" onclick="signOut()">Sign Out</button>
       <button class="theme-btn" id="themeBtn" onclick="cycleTheme()">☀️ Light</button>
-      <button class="tb-btn" onclick="openSettings()" title="Settings">&#9881;</button>
     </div>
   </div>
 
@@ -582,15 +581,16 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
           <button class="cb-nbtn" onclick="shiftDay(1)"  title="Forward 1 day">&#8250;</button>
           <button class="cb-nbtn" onclick="shiftWeek(1)" title="Forward 1 week">&#8594;</button>
           <button class="cb-today-btn" onclick="goDefault()">Next Day</button>
-          <button class="cb-today-btn" id="weekViewBtn" onclick="toggleWeekView()" style="background:var(--panel2);border-color:var(--line);color:var(--muted)">Week View</button>
+          <button class="cb-today-btn" id="weekViewBtn" onclick="toggleWeekView()">Week View</button>
           <div class="cb-sp"></div>
-          <button class="cb-goals-btn" id="goalsBtn" onclick="toggleGoals()">&#9998; Edit Goals</button>
+          <button class="cb-goals-btn" id="goalsBtn" onclick="toggleGoals()">&#9998; Goals</button>
+          <button class="cb-goals-btn" onclick="exportMonthCSV()">&#8595; Export</button>
+          <button class="cb-goals-btn" onclick="openSettings()">&#9881; Settings</button>
           <div id="weekGoalWrap" style="display:none;align-items:center;gap:5px">
             <span style="font-family:'Barlow Condensed',sans-serif;font-size:.7em;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;">Week Goal</span>
             <input type="number" min="1" max="999" id="weekGoalInp" class="cb-ginp editing" style="width:40px;font-size:.85em;padding:2px 4px;border-radius:4px;border:1px solid rgba(119,10,10,.3);background:var(--panel);color:var(--crimson);text-align:center;font-family:'Barlow Condensed',sans-serif;font-weight:700" oninput="updateGoal(3,this.value)">
           </div>
-          <button class="tb-btn" onclick="openDrawer()" style="background:var(--panel2);color:var(--muted);border-color:var(--line);">&#x229E; History</button>
-          <button class="tb-btn" onclick="exportMonthCSV()" style="background:var(--panel2);color:var(--muted);border-color:var(--line);">&#8595; Export MTD</button>
+          <button class="cb-goals-btn" onclick="openDrawer()">&#x229E; History</button>
         </div>
 
         <!-- board -->
@@ -935,15 +935,38 @@ function goDefault(){cbAnchor=nextBizFrom(new Date());reinitCB();}
 function shiftDay(n){cbAnchor=addBiz(cbAnchor,n);reinitCB();}
 
 // ── WEEK VIEW ──
+function getMondayOfCurrentWeek() {
+  var now = new Date();
+  var day = now.getDay(); // 0=Sun, 1=Mon...
+  var mon = new Date(now);
+  mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+  mon.setHours(0,0,0,0);
+  return mon;
+}
+
 function toggleWeekView(){
   weekView=!weekView;
-  numDays=weekView?5:loadConfig().numDays||3;
   var btn=document.getElementById('weekViewBtn');
-  if(btn){
-    btn.style.background=weekView?'var(--crimson-l)':'var(--panel2)';
-    btn.style.borderColor=weekView?'rgba(119,10,10,.2)':'var(--line)';
-    btn.style.color=weekView?'var(--crimson)':'var(--muted)';
-    btn.textContent=weekView?'Day View':'Week View';
+  if(weekView){
+    // Snap anchor to Monday of current week, show all 5 days
+    cbAnchor=getMondayOfCurrentWeek();
+    numDays=5;
+    if(btn){
+      btn.style.background='var(--crimson-l)';
+      btn.style.borderColor='rgba(119,10,10,.2)';
+      btn.style.color='var(--crimson)';
+      btn.textContent='3 Day View';
+    }
+  } else {
+    // Return to default next-business-day anchor with configured day count
+    cbAnchor=nextBizFrom(new Date());
+    numDays=loadConfig().numDays||3;
+    if(btn){
+      btn.style.background='';
+      btn.style.borderColor='';
+      btn.style.color='';
+      btn.textContent='Week View';
+    }
   }
   reinitCB();
 }
@@ -1013,15 +1036,21 @@ function saveSettings(){
   var cleanTechs=stgTechs.filter(function(t){return t.trim().length>0;});
   if(!cleanTechs.length){alert('Add at least one technician.');return;}
   var cfg={techs:cleanTechs,numDays:stgDays};
+  // Always save locally first — works even without Firestore
   saveConfigLocal(cfg);
   CB_TECHS=cleanTechs;
   if(!weekView) numDays=stgDays;
+  var el=document.getElementById('stgSaved');
+  function onSaved(){
+    if(el){el.style.display='block';setTimeout(function(){el.style.display='none';closeSettings();reinitCB();},1200);}
+  }
+  // Try Firestore — silently fall back if it fails
   db.collection('ppw_settings').doc('config').set(cfg)
-    .then(function(){
-      var el=document.getElementById('stgSaved');
-      if(el){el.style.display='block';setTimeout(function(){el.style.display='none';closeSettings();reinitCB();},1200);}
-    })
-    .catch(function(e){console.error(e);alert('Save failed. Check connection.');});
+    .then(onSaved)
+    .catch(function(e){
+      console.warn('Firestore config save failed, using local only:',e);
+      onSaved(); // still close and apply — local save is enough
+    });
 }
 
 // ── EXPORT MTD ──
