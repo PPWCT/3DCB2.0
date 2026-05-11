@@ -969,7 +969,7 @@ function renderCBHeaders(){
       '<div class="cb-goal-row">'+
         '<span class="cb-glbl">Goal</span>'+
         '<input class="cb-ginp'+(cbEditGoals?' editing':'')+'" type="number" min="1" max="99" value="'+goal+'" '+(cbEditGoals?'':'readonly')+
-        ' onchange="updateGoal('+i+',this.value)" style="pointer-events:'+(cbEditGoals?'auto':'none')+'">'+
+        ' oninput="updateGoal('+i+',this.value)" style="pointer-events:'+(cbEditGoals?'auto':'none')+'">'+
         '<div class="cb-gbar"><div class="cb-gfill" style="width:'+pct+'%"></div></div>'+
         '<span class="cb-gcnt">'+tot+'/'+goal+'</span></div>';
     wrap.appendChild(div);
