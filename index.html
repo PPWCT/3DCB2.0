@@ -809,8 +809,9 @@ function startListeners(){
 }
 
 function scheduleSave(ds){
-  setSyncSt('saving');clearTimeout(saveTimer);
-  saveTimer=setTimeout(function(){flushDay(ds);},500);
+  setSyncSt('saving');
+  clearTimeout(saveTimer);
+  flushDay(ds);
 }
 function flushDay(ds){
   var p={};
