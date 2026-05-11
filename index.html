@@ -769,6 +769,24 @@ function fetchWeather() {
 function loadGoals(){try{return JSON.parse(localStorage.getItem(GOAL_KEY))||DEF_GOALS.slice();}catch{return DEF_GOALS.slice();}}
 function saveGoalsLocal(){localStorage.setItem(GOAL_KEY,JSON.stringify(cbGoals));}
 
+// Goals live in a dedicated Firestore doc — never in day docs
+function saveGoalsRemote(){
+  db.collection('ppw_settings').doc('goals').set({goals:cbGoals})
+    .then(function(){setSyncSt('saved');})
+    .catch(function(e){console.error(e);setSyncSt('err');});
+}
+function listenGoals(){
+  db.collection('ppw_settings').doc('goals').onSnapshot(function(snap){
+    if(snap.exists && snap.data().goals && Array.isArray(snap.data().goals)){
+      cbGoals = snap.data().goals;
+      saveGoalsLocal();
+      renderCBHeaders();
+      renderCBTotals();
+      renderGoalsStrip();
+    }
+  });
+}
+
 function pad(n){return String(n).padStart(2,'0');}
 function dateKey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 function isBiz(d){var w=d.getDay();return w!==0&&w!==6;}
@@ -798,7 +816,6 @@ function startListeners(){
     var unsub=db.collection('callboard').doc(ds).onSnapshot(function(snap){
       if(snap.exists){
         cbCache[ds]=snap.data();
-        if(cbCache[ds]._goals&&Array.isArray(cbCache[ds]._goals)){cbGoals=cbCache[ds]._goals;saveGoalsLocal();}
         if(cbCache[ds]._out)cbOut=cbCache[ds]._out;
         if(cbCache[ds]._outdays)cbOutDays=cbCache[ds]._outdays;
       }else{cbCache[ds]={};}
@@ -816,7 +833,7 @@ function scheduleSave(ds){
 function flushDay(ds){
   var p={};
   CB_TECHS.forEach(function(t){p[t]=(cbCache[ds]&&cbCache[ds][t])||[];});
-  p._goals=cbGoals;p._out=cbOut;p._outdays=cbOutDays;
+  p._out=cbOut;p._outdays=cbOutDays;
   db.collection('callboard').doc(ds).set(p)
     .then(function(){setSyncSt('saved');})
     .catch(function(e){console.error(e);setSyncSt('err');});
@@ -834,7 +851,7 @@ function setAppts(ds,tech,arr){if(!cbCache[ds])cbCache[ds]={};cbCache[ds][tech]=
 function countActive(ds){return CB_TECHS.reduce(function(n,t){return n+getAppts(ds,t).filter(function(a){return a.status!=='cancelled';}).length;},0);}
 var _uid=Date.now();function uid(){return++_uid;}
 
-function initCB(){computeDays();startListeners();fetchWeather();fetchWeekAndRender();scheduleMidnight();}
+function initCB(){computeDays();startListeners();listenGoals();fetchWeather();fetchWeekAndRender();scheduleMidnight();}
 function reinitCB(){computeDays();startListeners();fetchWeather();fetchWeekAndRender();}
 function goDefault(){cbAnchor=nextBizFrom(new Date());reinitCB();}
 function shiftDay(n){cbAnchor=addBiz(cbAnchor,n);reinitCB();}
@@ -878,7 +895,7 @@ function toggleGoals(){
   if(wi) wi.value=cbGoals[3]||60;
   renderCBHeaders();
 }
-function updateGoal(idx,val){cbGoals[idx]=Math.max(1,parseInt(val)||1);saveGoalsLocal();scheduleSave(dateKey(cbDays[0]));renderCBHeaders();renderCBTotals();renderCBMetrics();renderGoalsStrip();}
+function updateGoal(idx,val){cbGoals[idx]=Math.max(1,parseInt(val)||1);saveGoalsLocal();saveGoalsRemote();renderCBHeaders();renderCBTotals();renderCBMetrics();renderGoalsStrip();}
 
 // ── WEEK HELPERS ──
 function getWeekDays() {
