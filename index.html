@@ -82,7 +82,7 @@ body.mode-dark .cb-token.s{background:rgba(142,190,239,.14);border-color:rgba(14
 body.mode-dark .cb-token.c{background:rgba(82,194,120,.15);border-color:rgba(82,194,120,.48)}
 body.mode-dark .cb-token.p{background:rgba(242,194,85,.13);border-color:rgba(242,194,85,.42)}
 body.mode-dark .cb-token.x{background:rgba(231,76,60,.12);border-color:rgba(231,76,60,.32)}
-body.mode-dark .cb-modal,.mode-dark .cb-drawer{background:#1C1C1C;border-color:rgba(142,190,239,.2)}
+body.mode-dark .cb-modal,body.mode-dark .cb-drawer{background:#1C1C1C;border-color:rgba(142,190,239,.2)}
 body.mode-dark .lcard{background:#1C1C1C;border-color:rgba(142,190,239,.2);box-shadow:0 24px 80px rgba(0,0,0,.6)}
 body.mode-dark .lcard::before{background:var(--blue)}
 
@@ -524,7 +524,7 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
       <div id="view-callboard" class="view active">
         <div class="eyebrow">Live Board</div>
         <div class="page-title">3-Day Call Board</div>
-        <p class="page-copy">Scheduling board for the next 3 business days. Click a tech name to mark them out for all 3 days. Hover a cell to cross out a specific day.</p>
+        <p class="page-copy">Scheduling board for the next <span id="dayCountLabel">3</span> business days. Click a tech name to mark them unavailable for all visible days. Hover a cell to cross out a specific day.</p>
 
         <!-- metrics -->
         <div class="cb-metrics">
@@ -740,7 +740,6 @@ function bootApp(name,pic){
   shell.style.display='block';
   shell.classList.add('active');
   initCB();
-  initOps();
 }
 function signOut(){
   sessionStorage.removeItem(SESS_KEY);
@@ -982,12 +981,13 @@ function loadConfigRemote(){
       var d=snap.data();
       if(d.techs&&Array.isArray(d.techs)&&d.techs.length>0){
         CB_TECHS=d.techs;
-        numDays=weekView?5:(d.numDays||3);
+        if(!weekView) numDays=d.numDays||3;
         saveConfigLocal({techs:CB_TECHS,numDays:d.numDays||3});
+        // Re-render with updated techs without restarting listeners
+        renderCB();
       }
     }
-    reinitCB();
-  }).catch(function(){reinitCB();});
+  }).catch(function(e){console.warn('Config load failed:',e);});
 }
 
 // ── SETTINGS MODAL ──
@@ -1106,7 +1106,10 @@ function shiftWeek(n){cbAnchor=addDays(cbAnchor,n*7);reinitCB();}
 
 function scheduleMidnight(){
   var now=new Date(),mid=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,5);
-  setTimeout(function(){cbAnchor=nextBizFrom(new Date());reinitCB();scheduleMidnight();},mid-now);
+  setTimeout(function(){
+    if(weekView){cbAnchor=getMondayOfCurrentWeek();}else{cbAnchor=nextBizFrom(new Date());}
+    reinitCB();scheduleMidnight();
+  },mid-now);
 }
 
 // calendar
@@ -1135,7 +1138,7 @@ document.addEventListener('click',function(e){if(calOpen&&!document.querySelecto
 // goals
 function toggleGoals(){
   cbEditGoals=!cbEditGoals;
-  document.getElementById('goalsBtn').innerHTML=cbEditGoals?'&#10003; Done':'&#9998; Edit Goals';
+  document.getElementById('goalsBtn').innerHTML=cbEditGoals?'&#10003; Done':'&#9998; Goals';
   var ww=document.getElementById('weekGoalWrap');
   if(ww){ ww.style.display=cbEditGoals?'flex':'none'; }
   var wi=document.getElementById('weekGoalInp');
@@ -1176,28 +1179,33 @@ function fetchWeekAndRender() {
 }
 
 function renderGoalsStrip() {
-  var todayDs = todayKey;
-  var tmrDs   = dateKey(nextBizFrom(new Date()));
-
-  // Today — first active day that is today or tomorrow
-  var dayDs = dateKey(cbDays[0]);
-  var dayGoal = cbGoals[0];
+  // First column label (Today/Tomorrow/day name)
+  var dayDs   = dateKey(cbDays[0]);
+  var dayGoal = cbGoals[0]||12;
   var dayVal  = countActive(dayDs);
   var dayPct  = Math.min(100, Math.round((dayVal/dayGoal)*100));
+  var dayLbl  = eyebrowLbl(cbDays[0]);
 
-  // 3-Day
-  var threeDayGoal = cbGoals[0]+cbGoals[1]+cbGoals[2];
-  var threeDayVal  = cbDays.reduce(function(n,d){ return n+countActive(dateKey(d)); },0);
-  var threeDayPct  = Math.min(100, Math.round((threeDayVal/threeDayGoal)*100));
+  // Board total (all visible days)
+  var boardGoal = cbDays.reduce(function(n,d,i){return n+(cbGoals[i]||cbGoals[0]||12);},0);
+  var boardVal  = cbDays.reduce(function(n,d){return n+countActive(dateKey(d));},0);
+  var boardPct  = Math.min(100, Math.round((boardVal/boardGoal)*100));
+  var boardLbl  = weekView ? 'Week Board' : numDays+'\u2011Day';
 
-  // Week
+  // Full week
   var weekGoal = cbGoals[3] || 60;
   var weekDays = getWeekDays();
   var weekVal  = weekDays.reduce(function(n,d){ return n+countActive(dateKey(d)); },0);
   var weekPct  = Math.min(100, Math.round((weekVal/weekGoal)*100));
 
+  // Update strip labels dynamically
+  var lbl1 = document.querySelector('#gs-day-val')?.closest('.cb-gs-cell')?.querySelector('.cb-gs-label');
+  if(lbl1) lbl1.textContent = dayLbl;
+  var lbl2 = document.querySelector('#gs-3day-val')?.closest('.cb-gs-cell')?.querySelector('.cb-gs-label');
+  if(lbl2) lbl2.textContent = boardLbl;
+
   setGs('day',  dayVal,  dayGoal,  dayPct);
-  setGs('3day', threeDayVal, threeDayGoal, threeDayPct);
+  setGs('3day', boardVal, boardGoal, boardPct);
   setGs('week', weekVal, weekGoal, weekPct);
 }
 
@@ -1216,7 +1224,8 @@ function toggleDay(tech,ds,e){e.stopPropagation();var k=tech+':'+ds;cbOutDays[k]
 
 // RENDER
 function renderCB(){
-  document.getElementById('cbRange').textContent=fmtS(cbDays[0])+' \u2013 '+fmtS(cbDays[2]);
+  document.getElementById('cbRange').textContent=fmtS(cbDays[0])+' \u2013 '+fmtS(cbDays[cbDays.length-1]);
+  var dcl=document.getElementById('dayCountLabel');if(dcl)dcl.textContent=numDays;
   renderCBHeaders();renderCBGrid();renderCBTotals();renderCBMetrics();renderGoalsStrip();
 }
 
@@ -1303,7 +1312,7 @@ function mkToken(a,tech,ds){
 function renderCBTotals(){
   var row=document.getElementById('cbTotals');row.innerHTML='<div class="cb-totals-lbl">Daily<br>Totals</div>';
   cbDays.forEach(function(d,i){
-    var ds=dateKey(d),tot=countActive(ds),goal=cbGoals[i];
+    var ds=dateKey(d),tot=countActive(ds),goal=cbGoals[i]||cbGoals[0]||12;
     var div=document.createElement('div');div.className='cb-tcell';
     div.innerHTML='<span class="cb-tcnt">'+tot+'</span><span class="cb-tgoal">of <strong>'+goal+'</strong> \u2014 '+Math.min(100,Math.round((tot/goal)*100))+'%</span>';
     row.appendChild(div);
@@ -1402,215 +1411,6 @@ function delAppt(){
 }
 
 // ═══════════════════════
-// OPS KIT
-// ═══════════════════════
-var TEAM={csrs:['Ashley','Mollie'],techs:['Anthony','Joe','Tyler','Zach']};
-var JOB_TYPES=['Diagnostic','Drain Repair / Clearing','Supply Line Repair','Water Heater Repair','Water Heater Installation','Fixture Install / Repair','Leak Detection & Repair','Annual Maintenance Inspection','Emergency Service','Other'];
-
-var CSR_FLOWS={
-  serviceCheckIn:{label:'Service Check-In',opening:function(x){return'Hi, this is '+x.csr+' with Prestige Plumbing Werks. '+x.tech+' was recently out for a service call. Do you have a quick minute to chat?';},nodes:{
-    root:{script:'Listen first. Match the customer tone, then click the closest response below.',responses:[
-      {label:'Everything went great',next:'review'},
-      {label:'Mostly good, one small issue',next:'feedback'},
-      {label:'Still having the same issue',next:'redo'},
-      {label:'The tech was excellent',next:'compliment'},
-      {label:'I was not happy',next:'escalate'}
-    ]},
-    review:{script:"That's great to hear. If you have a spare moment, a quick Google review really helps us reach more homeowners.",responses:[
-      {label:"I'll leave a review",outcome:'Review committed'},
-      {label:'Not today, but all good',outcome:'Positive close'}
-    ]},
-    feedback:{script:"I appreciate that. What was the one thing we could have done better? I'll make sure it gets noted.",responses:[
-      {label:'Just wanted it noted',outcome:'Feedback logged'},
-      {label:'I want someone to follow up',outcome:'Follow-up required'}
-    ]},
-    redo:{script:"I'm sorry to hear that. Let's get this corrected at no charge. Would you like the same tech or fresh eyes?",responses:[
-      {label:'Send the same tech',outcome:'Redo scheduled'},
-      {label:'Send someone different',outcome:'Redo — different tech'},
-      {label:'I want to speak with a manager',outcome:'Escalated to Lauren'}
-    ]},
-    compliment:{script:"That's wonderful — I'll make sure he hears that. Would you be open to leaving a quick Google review?",responses:[
-      {label:'Happy to leave a review',outcome:'Review committed + compliment logged'},
-      {label:'Too busy right now',outcome:'Compliment logged'}
-    ]},
-    escalate:{script:"I hear you and I'm sorry. I'm not going to make excuses. Let me get the right person involved.",responses:[
-      {label:'Please have someone call me',outcome:'Escalated to Lauren'},
-      {label:'I just wanted it on record',outcome:'Complaint logged'}
-    ]}
-  }},
-  membership:{label:'Membership Check-In',opening:function(x){return'Hi, this is '+x.csr+' with Prestige Plumbing Werks, just checking in on your membership to make sure everything looks good on your end.';},nodes:{
-    root:{script:'Confirm they are satisfied and see if there are any upcoming plumbing needs.',responses:[
-      {label:"All good, thanks",outcome:'Membership healthy'},
-      {label:'I may need something soon',outcome:'Scheduling opportunity — follow up'},
-      {label:"I'm not sure it's worth it",outcome:'Retention risk — flag for Lauren'}
-    ]}
-  }},
-  inboundUpset:{label:'Inbound Upset',opening:function(x){return'Thank you for calling Prestige Plumbing Werks, this is '+x.csr+'. I\'m sorry something went wrong — tell me what happened.';},nodes:{
-    root:{script:"Let them finish completely before responding. Don't defend. Capture the issue, then route it.",responses:[
-      {label:'Job issue / still broken',outcome:'Redo triage — schedule callback'},
-      {label:'Price complaint',outcome:'Billing review — flag for Lauren'},
-      {label:'Tech behavior complaint',outcome:'Urgent escalation to Lauren'},
-      {label:'Damage or mess',outcome:'Urgent escalation to Lauren'}
-    ]}
-  }}
-};
-
-var opsState={
-  csr:TEAM.csrs[0], tech:TEAM.techs[0], flow:'serviceCheckIn', session:null,
-  dispatch:{tech:TEAM.techs[0],eta:20,address:'',jobType:JOB_TYPES[0],notes:''},
-  briefing:null,
-  debrief:{tech:TEAM.techs[0],jobType:JOB_TYPES[0],outcome:'won',notes:'',owner:'Lauren',date:''}
-};
-
-function initOps(){
-  renderCSR();
-  renderDispatch();
-  renderDebrief();
-  bindOpsEvents();
-}
-
-// ── CSR ──
-function renderCSR(){
-  var el=$('csr-csr');if(el)el.innerHTML=TEAM.csrs.map(function(c){return'<option'+(c===opsState.csr?' selected':'')+'>'+c+'</option>';}).join('');
-  var et=$('csr-tech');if(et)et.innerHTML=TEAM.techs.map(function(t){return'<option'+(t===opsState.tech?' selected':'')+'>'+t+'</option>';}).join('');
-  var fb=$('csr-flow-buttons');
-  if(fb)fb.innerHTML=Object.keys(CSR_FLOWS).map(function(k){return'<button class="choice-btn'+(opsState.flow===k?' on-blue':'')+'" data-csr-flow="'+k+'">'+CSR_FLOWS[k].label+'</button>';}).join('');
-
-  var live=$('csr-live');
-  if(!opsState.session){if(live)live.classList.add('hidden');return;}
-  if(live)live.classList.remove('hidden');
-
-  var sess=opsState.session;
-  var lbl=$('csr-flow-label');if(lbl)lbl.textContent=CSR_FLOWS[opsState.flow].label;
-  var sb=$('csr-script-box');
-  var rl=$('csr-response-list');
-  var oc=$('csr-outcome');
-  var lg=$('csr-log');
-
-  if(sess.outcome){
-    if(sb)sb.textContent='Call complete.';
-    if(rl)rl.innerHTML='';
-    if(oc){oc.classList.remove('hidden');oc.textContent='Outcome: '+sess.outcome;}
-  }else{
-    var node=CSR_FLOWS[opsState.flow].nodes[sess.nodeId];
-    if(sb)sb.textContent=node.script;
-    if(rl)rl.innerHTML=node.responses.map(function(r,i){return'<button class="choice-btn" data-csr-response="'+i+'">'+r.label+'</button>';}).join('');
-    if(oc)oc.classList.add('hidden');
-  }
-  if(lg)lg.innerHTML=sess.log.map(function(e){return'<div class="log-entry"><div class="log-actor">'+e.actor+'</div><div class="log-text">'+e.text+'</div></div>';}).join('');
-}
-
-// ── DISPATCH ──
-function renderDispatch(){
-  var dt=$('dispatch-tech');if(dt)dt.innerHTML=TEAM.techs.map(function(t){return'<option'+(t===opsState.dispatch.tech?' selected':'')+'>'+t+'</option>';}).join('');
-  var de=$('dispatch-eta');if(de)de.value=opsState.dispatch.eta;
-  var da=$('dispatch-address');if(da)da.value=opsState.dispatch.address;
-  var dj=$('dispatch-jobtype');if(dj)dj.innerHTML=JOB_TYPES.map(function(j){return'<option'+(j===opsState.dispatch.jobType?' selected':'')+'>'+j+'</option>';}).join('');
-  var dn=$('dispatch-notes');if(dn)dn.value=opsState.dispatch.notes;
-}
-
-function renderBriefing(){
-  var b=opsState.briefing;
-  var body=$('briefing-body');
-  var title=$('briefing-title');
-  var sub=$('briefing-sub');
-  var status=$('briefing-status');
-  if(!b){
-    if(title)title.textContent='No briefing yet';
-    if(sub)sub.textContent='Go to Dispatch and fill out the job.';
-    if(status)status.textContent='Waiting';
-    if(body)body.innerHTML='<div class="callout" style="color:var(--muted)">Generate a briefing from the Dispatch tab.</div>';
-    return;
-  }
-  if(title)title.textContent=b.tech+' — '+b.jobType;
-  if(sub)sub.textContent='Generated '+new Date(b.createdAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  if(status){status.textContent='Ready';status.className='tag green';}
-  if(body)body.innerHTML=
-    '<div class="sum-grid">'+
-      mkSumBox('Tech',b.tech)+mkSumBox('ETA',b.eta+' min')+mkSumBox('Job Type',b.jobType)+mkSumBox('Address',b.address||'—')+
-    '</div>'+
-    (b.notes?'<div><div class="sum-label">Notes</div><div class="callout">'+esc(b.notes)+'</div></div>':'')+
-    '<div><div class="sum-label">Reminders</div><div class="stack">'+
-      '<div class="callout">Greet by name, present card at the door.</div>'+
-      '<div class="callout">Review job type and notes before approaching.</div>'+
-      '<div class="callout">Present all 3 options clearly — no surprises on price.</div>'+
-    '</div></div>';
-}
-function mkSumBox(l,v){return'<div class="sum-box"><div class="sum-label">'+l+'</div><div class="sum-val">'+esc(v)+'</div></div>';}
-
-// ── DEBRIEF ──
-function renderDebrief(){
-  var dt=$('debrief-tech');if(dt)dt.innerHTML=TEAM.techs.map(function(t){return'<option'+(t===opsState.debrief.tech?' selected':'')+'>'+t+'</option>';}).join('');
-  var dj=$('debrief-jobtype');if(dj)dj.innerHTML=JOB_TYPES.map(function(j){return'<option'+(j===opsState.debrief.jobType?' selected':'')+'>'+j+'</option>';}).join('');
-  var oc=$('debrief-outcome');
-  if(oc)oc.innerHTML=[{id:'won',label:'✓ Won',cls:'on-green'},{id:'lost',label:'✗ Lost',cls:'on-red'}].map(function(o){return'<button class="choice-btn'+(opsState.debrief.outcome===o.id?' '+o.cls:'')+'" data-debrief-outcome="'+o.id+'">'+o.label+'</button>';}).join('');
-  var dn=$('debrief-notes');if(dn)dn.value=opsState.debrief.notes;
-  var dw=$('debrief-owner');if(dw)dw.value=opsState.debrief.owner;
-  var dd=$('debrief-date');if(dd)dd.value=opsState.debrief.date;
-}
-
-function bindOpsEvents(){
-  var cc=$('csr-csr');if(cc)cc.addEventListener('change',function(e){opsState.csr=e.target.value;renderCSR();});
-  var ct=$('csr-tech');if(ct)ct.addEventListener('change',function(e){opsState.tech=e.target.value;renderCSR();});
-  var fb=$('csr-flow-buttons');
-  if(fb)fb.addEventListener('click',function(e){var b=e.target.closest('[data-csr-flow]');if(!b)return;opsState.flow=b.dataset.csrFlow;opsState.session=null;renderCSR();});
-  var sb=$('csr-start-btn');
-  if(sb)sb.addEventListener('click',function(){
-    var flow=CSR_FLOWS[opsState.flow];
-    var opening=flow.opening({csr:opsState.csr,tech:opsState.tech});
-    opsState.session={nodeId:'root',outcome:'',log:[{actor:'CSR',text:opening}]};
-    renderCSR();
-  });
-  var rb=$('csr-reset-btn');if(rb)rb.addEventListener('click',function(){opsState.session=null;renderCSR();});
-  var rl=$('csr-response-list');
-  if(rl)rl.addEventListener('click',function(e){
-    var b=e.target.closest('[data-csr-response]');if(!b||!opsState.session)return;
-    var idx=Number(b.dataset.csrResponse);
-    var node=CSR_FLOWS[opsState.flow].nodes[opsState.session.nodeId];
-    var resp=node.responses[idx];
-    opsState.session.log.push({actor:'Customer',text:resp.label});
-    if(resp.next){
-      var nextNode=CSR_FLOWS[opsState.flow].nodes[resp.next];
-      opsState.session.nodeId=resp.next;
-      opsState.session.log.push({actor:'Guide',text:nextNode.script});
-    }else{
-      opsState.session.outcome=resp.outcome||'Call complete';
-      opsState.session.log.push({actor:'Outcome',text:resp.outcome||'Call complete'});
-    }
-    renderCSR();
-  });
-
-  // dispatch
-  var dtech=$('dispatch-tech');if(dtech)dtech.addEventListener('change',function(e){opsState.dispatch.tech=e.target.value;});
-  var deta=$('dispatch-eta');if(deta)deta.addEventListener('input',function(e){opsState.dispatch.eta=Number(e.target.value)||0;});
-  var daddr=$('dispatch-address');if(daddr)daddr.addEventListener('input',function(e){opsState.dispatch.address=e.target.value;});
-  var djob=$('dispatch-jobtype');if(djob)djob.addEventListener('change',function(e){opsState.dispatch.jobType=e.target.value;});
-  var dnotes=$('dispatch-notes');if(dnotes)dnotes.addEventListener('input',function(e){opsState.dispatch.notes=e.target.value;});
-  var dgen=$('dispatch-generate-btn');
-  if(dgen)dgen.addEventListener('click',function(){
-    if(!opsState.dispatch.address.trim()){alert('Enter an address first.');return;}
-    opsState.briefing={createdAt:new Date().toISOString(),tech:opsState.dispatch.tech,eta:opsState.dispatch.eta,address:opsState.dispatch.address,jobType:opsState.dispatch.jobType,notes:opsState.dispatch.notes};
-    renderBriefing();
-    goTab('briefing');
-  });
-
-  // debrief
-  var dbtech=$('debrief-tech');if(dbtech)dbtech.addEventListener('change',function(e){opsState.debrief.tech=e.target.value;renderDebrief();});
-  var dbjob=$('debrief-jobtype');if(dbjob)dbjob.addEventListener('change',function(e){opsState.debrief.jobType=e.target.value;renderDebrief();});
-  var dboc=$('debrief-outcome');if(dboc)dboc.addEventListener('click',function(e){var b=e.target.closest('[data-debrief-outcome]');if(!b)return;opsState.debrief.outcome=b.dataset.debriefOutcome;renderDebrief();});
-  var dbnotes=$('debrief-notes');if(dbnotes)dbnotes.addEventListener('input',function(e){opsState.debrief.notes=e.target.value;});
-  var dbowner=$('debrief-owner');if(dbowner)dbowner.addEventListener('input',function(e){opsState.debrief.owner=e.target.value;});
-  var dbdate=$('debrief-date');if(dbdate)dbdate.addEventListener('input',function(e){opsState.debrief.date=e.target.value;});
-  var dbsave=$('debrief-save-btn');
-  if(dbsave)dbsave.addEventListener('click',function(){
-    var saved=$('debrief-saved');
-    if(saved){saved.classList.remove('hidden');setTimeout(function(){saved.classList.add('hidden');},2500);}
-  });
-}
-
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function $(id){return document.getElementById(id);}
-// ═══════════════════════
 // THEME
 // ═══════════════════════
 var THEMES=['light','dark','fun'];
@@ -1631,7 +1431,8 @@ function cycleTheme(){
   applyTheme(next);
 }
 
-window.addEventListener('load',function(){applyTheme(currentTheme);});
+// Apply theme immediately to prevent flash
+applyTheme(currentTheme);
 </script>
 </body>
 </html>
