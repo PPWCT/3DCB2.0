@@ -888,8 +888,6 @@ function startListeners(){
     var unsub=db.collection('callboard').doc(ds).onSnapshot(function(snap){
       if(snap.exists){
         cbCache[ds]=snap.data();
-        if(cbCache[ds]._out)cbOut=cbCache[ds]._out;
-        if(cbCache[ds]._outdays)cbOutDays=cbCache[ds]._outdays;
       }else{cbCache[ds]={};}
       renderCB();
     },function(err){console.warn('Firestore err:',err);});
@@ -905,7 +903,7 @@ function scheduleSave(ds){
 function flushDay(ds){
   var p={};
   CB_TECHS.forEach(function(t){p[t]=(cbCache[ds]&&cbCache[ds][t])||[];});
-  p._out=cbOut;p._outdays=cbOutDays;
+  // _out and _outdays now live in ppw_settings/board — not in day docs
   db.collection('callboard').doc(ds).set(p)
     .then(function(){setSyncSt('saved');})
     .catch(function(e){console.error(e);setSyncSt('err');});
@@ -927,7 +925,7 @@ function initCB(){
   var cfg=loadConfig();
   CB_TECHS=cfg.techs||CB_TECHS;
   numDays=cfg.numDays||3;
-  computeDays();startListeners();listenGoals();loadConfigRemote();fetchWeather();fetchWeekAndRender();scheduleMidnight();
+  computeDays();startListeners();listenGoals();listenConfig();listenBoard();fetchWeather();fetchWeekAndRender();scheduleMidnight();
 }
 function reinitCB(){computeDays();startListeners();fetchWeather();fetchWeekAndRender();}
 function goDefault(){cbAnchor=nextBizFrom(new Date());reinitCB();}
@@ -975,19 +973,45 @@ var CFG_KEY='ppw_cfg_v1';
 function loadConfig(){try{return JSON.parse(localStorage.getItem(CFG_KEY))||{techs:CB_TECHS.slice(),numDays:3};}catch{return {techs:CB_TECHS.slice(),numDays:3};}}
 function saveConfigLocal(cfg){localStorage.setItem(CFG_KEY,JSON.stringify(cfg));}
 
-function loadConfigRemote(){
-  db.collection('ppw_settings').doc('config').get().then(function(snap){
+// ── REAL-TIME CONFIG LISTENER ──
+// Replaces one-time get — all devices update instantly when settings change
+function listenConfig(){
+  db.collection('ppw_settings').doc('config').onSnapshot(function(snap){
     if(snap.exists){
       var d=snap.data();
       if(d.techs&&Array.isArray(d.techs)&&d.techs.length>0){
-        CB_TECHS=d.techs;
-        if(!weekView) numDays=d.numDays||3;
-        saveConfigLocal({techs:CB_TECHS,numDays:d.numDays||3});
-        // Re-render with updated techs without restarting listeners
-        renderCB();
+        var techsChanged = JSON.stringify(CB_TECHS) !== JSON.stringify(d.techs);
+        var daysChanged  = !weekView && (d.numDays||3) !== numDays;
+        CB_TECHS = d.techs;
+        if(!weekView) numDays = d.numDays||3;
+        saveConfigLocal({techs:CB_TECHS, numDays:d.numDays||3});
+        if(techsChanged || daysChanged){
+          // Rebuild board with new config
+          computeDays(); startListeners(); fetchWeather(); fetchWeekAndRender();
+        } else {
+          renderCB();
+        }
       }
     }
-  }).catch(function(e){console.warn('Config load failed:',e);});
+  }, function(e){ console.warn('Config listener error:', e); });
+}
+
+// ── REAL-TIME BOARD STATE LISTENER ──
+// Tech crossouts live in ppw_settings/board so they sync to all devices instantly
+function listenBoard(){
+  db.collection('ppw_settings').doc('board').onSnapshot(function(snap){
+    if(snap.exists){
+      var d=snap.data();
+      if(d.out)    cbOut     = d.out;
+      if(d.outdays) cbOutDays = d.outdays;
+      renderCBGrid();
+    }
+  }, function(e){ console.warn('Board listener error:', e); });
+}
+
+function saveBoardState(){
+  db.collection('ppw_settings').doc('board').set({out:cbOut, outdays:cbOutDays})
+    .catch(function(e){ console.warn('Board save failed:', e); });
 }
 
 // ── SETTINGS MODAL ──
@@ -1219,8 +1243,8 @@ function setGs(key, val, goal, pct) {
 }
 
 // tech out
-function toggleTech(tech){cbOut[tech]=!cbOut[tech];scheduleSave(dateKey(cbDays[0]));renderCB();}
-function toggleDay(tech,ds,e){e.stopPropagation();var k=tech+':'+ds;cbOutDays[k]=!cbOutDays[k];scheduleSave(ds);renderCB();}
+function toggleTech(tech){cbOut[tech]=!cbOut[tech];saveBoardState();renderCBGrid();}
+function toggleDay(tech,ds,e){e.stopPropagation();var k=tech+':'+ds;cbOutDays[k]=!cbOutDays[k];saveBoardState();renderCBGrid();}
 
 // RENDER
 function renderCB(){
