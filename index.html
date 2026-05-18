@@ -339,7 +339,7 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
 .cb-acell{background:var(--panel);border:1px solid var(--line);border-radius:var(--rl);padding:6px;min-height:62px;transition:border-color .2s;position:relative}
 .cb-acell:hover{border-color:#C5BAB0}
 .cb-acell.next{border-color:rgba(119,10,10,.25)}
-.cb-acell.past{opacity:.5;pointer-events:none}
+.cb-acell.past{opacity:.6;border-style:dashed}
 .cb-acell.tech-out{opacity:.25;pointer-events:none;background:repeating-linear-gradient(135deg,var(--panel),var(--panel) 6px,rgba(153,27,27,.03) 6px,rgba(153,27,27,.03) 12px)}
 .cb-acell.day-out{opacity:.3;background:repeating-linear-gradient(135deg,var(--panel),var(--panel) 6px,rgba(153,27,27,.04) 6px,rgba(153,27,27,.04) 12px);border-color:rgba(153,27,27,.2)}
 .cb-acell.day-out .cb-trow{pointer-events:none}
@@ -1270,10 +1270,11 @@ function renderCBHeaders(){
   cbDays.forEach(function(d,i){
     var ds=dateKey(d),tot=countActive(ds),goal=cbGoals[i]||cbGoals[0]||12,pct=Math.min(100,Math.round((tot/goal)*100));
     var isNext=ds===dateKey(nextBizFrom(new Date()));
+    var isPastHdr=ds<todayKey;
     var wx=weatherCache[ds];
     var wxHtml=wx?'<span class="cb-weather"><span class="cb-weather-icon">'+wx.icon+'</span><span class="cb-weather-temp">'+wx.temp+'°</span></span>':'';
     var div=document.createElement('div');div.className='cb-col-hdr';
-    div.innerHTML='<div class="cb-eyebrow">'+eyebrowLbl(d)+'</div>'+
+    div.innerHTML='<div class="cb-eyebrow">'+(isPastHdr?'<span style="color:var(--amber);margin-right:4px;">PAST</span>':'')+eyebrowLbl(d)+'</div>'+
       '<div class="cb-date'+(isNext?' next':'')+'" style="display:flex;align-items:center;">'+fmtS(d)+wxHtml+'</div>'+
       '<div class="cb-goal-row">'+
         '<span class="cb-glbl">Goal</span>'+
@@ -1300,7 +1301,8 @@ function renderCBGrid(){
       var dk2=tech+':'+ds,isDayOut=!!cbOutDays[dk2];
       var cell=document.createElement('div');
       cell.className='cb-acell'+(isNext?' next':'')+(isPast?' past':'')+(isOut?' tech-out':isDayOut?' day-out':'');
-      if(!isPast&&!isOut){
+      // X button available on all days (past and future) unless tech is fully out
+      if(!isOut){
         var dx=document.createElement('button');dx.className='cb-day-x'+(isDayOut?' active':'');
         dx.innerHTML='&#x2715;';dx.title=isDayOut?'Restore this day':'Mark day unavailable';
         dx.onclick=(function(t,s){return function(e){toggleDay(t,s,e);};})(tech,ds);
@@ -1309,11 +1311,11 @@ function renderCBGrid(){
       var row=document.createElement('div');row.className='cb-trow';
       if(!isOut&&!isDayOut){
         getAppts(ds,tech).forEach(function(a){row.appendChild(mkToken(a,tech,ds));});
-        if(!isPast){
-          var btn=document.createElement('button');btn.className='cb-add';btn.textContent='+';
-          btn.onclick=(function(t,s){return function(){openModal(t,s,null);};})(tech,ds);
-          row.appendChild(btn);
-        }
+        // Add button available on all days so history can be updated
+        var btn=document.createElement('button');btn.className='cb-add';btn.textContent='+';
+        btn.title=isPast?'Add to history':'Add appointment';
+        btn.onclick=(function(t,s){return function(){openModal(t,s,null);};})(tech,ds);
+        row.appendChild(btn);
       }
       cell.appendChild(row);grid.appendChild(cell);
     });
