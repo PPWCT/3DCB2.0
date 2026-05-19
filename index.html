@@ -773,7 +773,7 @@ document.querySelectorAll('.nav-btn[data-tab]').forEach(function(btn){
 // ═══════════════════════
 // CALL BOARD
 // ═══════════════════════
-var CB_TECHS=['Anthony','Joe','Tyler','Zach','Shea'];
+var CB_TECHS=['Anthony','Joe','Tyler','Shea'];
 var DEF_GOALS=[12,8,4,60]; // [day1, day2, day3, weekTotal]
 var numDays=3;        // configurable 2-7
 var weekView=false;   // true = locked to 5 days
@@ -787,7 +787,7 @@ var cbEditGoals=false;
 var calOpen=false;
 var calView=new Date();
 var listeners=[];
-var saveTimer=null;
+var collectionListenerActive=false;
 var cbOut={};
 var cbOutDays={};
 var mState=null;
@@ -881,35 +881,65 @@ function eyebrowLbl(d){
 
 function stopListeners(){listeners.forEach(function(u){try{u();}catch(e){}});listeners=[];}
 
+// ── SINGLE BROAD LISTENER ──
+// Listens to ALL callboard documents from 60 days ago through 30 days ahead.
+// This means every logged-in device hears every change, regardless of which
+// date window they're currently viewing — no missed updates.
+var collectionListenerActive = false;
+
 function startListeners(){
+  // Only need one collection-level listener — stop the old per-day ones
   stopListeners();
-  cbDays.forEach(function(d){
-    var ds=dateKey(d);
-    var unsub=db.collection('callboard').doc(ds).onSnapshot(function(snap){
-      if(snap.exists){
-        cbCache[ds]=snap.data();
-      }else{cbCache[ds]={};}
+  if(collectionListenerActive) return;
+  collectionListenerActive = true;
+
+  // Build date range: 60 days back through 30 days ahead
+  var now    = new Date();
+  var past60 = dateKey(addDays(now, -60));
+  var fwd30  = dateKey(addDays(now,  30));
+
+  var unsub = db.collection('callboard')
+    .where(firebase.firestore.FieldPath.documentId(), '>=', past60)
+    .where(firebase.firestore.FieldPath.documentId(), '<=', fwd30)
+    .onSnapshot(function(snapshot){
+      snapshot.docChanges().forEach(function(change){
+        var ds   = change.doc.id;
+        var data = change.doc.data();
+        if(change.type === 'removed'){
+          delete cbCache[ds];
+        } else {
+          cbCache[ds] = data;
+        }
+      });
       renderCB();
-    },function(err){console.warn('Firestore err:',err);});
-    listeners.push(unsub);
-  });
+      renderGoalsStrip();
+    }, function(err){
+      console.warn('Collection listener error:', err);
+      collectionListenerActive = false;
+      // Retry after 3 seconds
+      setTimeout(function(){ collectionListenerActive=false; startListeners(); }, 3000);
+    });
+
+  listeners.push(function(){ unsub(); collectionListenerActive=false; });
 }
 
 function scheduleSave(ds){
   setSyncSt('saving');
-  clearTimeout(saveTimer);
   flushDay(ds);
 }
+
 function flushDay(ds){
   var p={};
   CB_TECHS.forEach(function(t){p[t]=(cbCache[ds]&&cbCache[ds][t])||[];});
-  // _out and _outdays now live in ppw_settings/board — not in day docs
-  db.collection('callboard').doc(ds).set(p)
+  // Use merge:true so simultaneous writes from different devices don't overwrite each other
+  db.collection('callboard').doc(ds).set(p, {merge:true})
     .then(function(){setSyncSt('saved');})
     .catch(function(e){console.error(e);setSyncSt('err');});
 }
+
 function setSyncSt(s){
-  var el=document.getElementById('syncSt');el.className='cb-sync '+s;
+  var el=document.getElementById('syncSt');if(!el)return;
+  el.className='cb-sync '+s;
   if(s==='saving')el.innerHTML='&#8635; Saving&hellip;';
   else if(s==='saved')el.innerHTML='&#10003; Saved';
   else el.innerHTML='&#9888; Sync Error';
@@ -927,7 +957,7 @@ function initCB(){
   numDays=cfg.numDays||3;
   computeDays();startListeners();listenGoals();listenConfig();listenBoard();fetchWeather();fetchWeekAndRender();scheduleMidnight();
 }
-function reinitCB(){computeDays();startListeners();fetchWeather();fetchWeekAndRender();}
+function reinitCB(){computeDays();renderCB();fetchWeather();fetchWeekAndRender();}
 function goDefault(){cbAnchor=nextBizFrom(new Date());reinitCB();}
 function shiftDay(n){cbAnchor=addBiz(cbAnchor,n);reinitCB();}
 
