@@ -507,7 +507,7 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
 .ob-btn:hover{box-shadow:0 6px 22px rgba(119,10,10,.38),inset 0 -3px 0 rgba(0,0,0,.15)}
 .ob-btn:active{transform:scale(.92);box-shadow:0 2px 6px rgba(119,10,10,.25),inset 0 -2px 0 rgba(0,0,0,.15)}
 .ob-count{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:2.3em;line-height:1;display:block}
-.ob-tap{font-family:'Barlow Condensed',sans-serif;font-size:.58em;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.6;margin-top:2px}
+.ob-tap{font-family:'Barlow',sans-serif;font-size:.72em;font-weight:400;font-style:italic;letter-spacing:-.01em;text-transform:lowercase;opacity:.5;margin-top:1px}
 .ob-undo{font-family:'Barlow Condensed',sans-serif;font-size:.66em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:none;border:none;color:var(--dim);cursor:pointer;padding:3px 10px;border-radius:var(--r);transition:all .15s}
 .ob-undo:hover{color:var(--red);background:var(--red-l)}
 .ob-undo:disabled{opacity:.3;cursor:not-allowed}
@@ -1591,7 +1591,7 @@ function delAppt(){
 // ═══════════════════════
 // OUTBOUND CALL TICKER
 // ═══════════════════════
-var CB_CSRS=['Ashley','Mollie'];
+var CB_CSRS=['Mollie','Ashley'];
 var CSRS_KEY='ppw_csrs_v1';
 var OB_GOAL_KEY='ppw_ob_goal_v1';
 var obGoal=60;
@@ -1715,10 +1715,10 @@ function buildObStructure(){
     html+=
       '<div class="ob-card'+(mine?' mine':'')+'">'+
         '<div class="ob-csr-name">'+csr+'</div>'+
-        '<button class="ob-btn" id="ob-btn-'+safeId+'" onclick="bumpOb(\''+csr.replace(/'/g,"\\'")+'\',1)" title="Tap for every outbound call">'+
-          '<span class="ob-count" id="ob-count-'+safeId+'">0</span>'+
-          '<span class="ob-tap">tap</span>'+
-        '</button>'+
+          '<button class="ob-btn" id="ob-btn-'+safeId+'" onclick="bumpOb(\''+csr.replace(/'/g,"\\'")+'\',1)" title="Tap for every outbound call">'+
+            '<span class="ob-count" id="ob-count-'+safeId+'">0</span>'+
+            '<span class="ob-tap">wow.</span>'+
+          '</button>'+
         '<button class="ob-undo" id="ob-undo-'+safeId+'" onclick="bumpOb(\''+csr.replace(/'/g,"\\'")+'\',-1)" title="Undo last">−1</button>'+
       '</div>';
   });
