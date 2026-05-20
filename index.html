@@ -475,88 +475,6 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
   .tb-name{font-size:1.4em}
   .tb-right{gap:10px}
 }
-
-/* ════════════════════════════
-   OUTBOUND CALL TICKER
-   ════════════════════════════ */
-.ob-ticker{background:var(--panel);border:1px solid var(--line);border-radius:var(--rl);padding:14px 16px 16px;margin-bottom:12px;position:relative;overflow:hidden}
-.ob-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
-.ob-title{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
-.ob-label{font-family:'Barlow Condensed',sans-serif;font-size:.72em;font-weight:700;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
-.ob-total{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.6em;color:var(--crimson);margin-left:8px;line-height:1;transition:color .3s}
-.ob-total.full{color:var(--green)}
-.ob-slash{font-family:'Barlow Condensed',sans-serif;color:var(--muted);font-size:1.2em;line-height:1}
-.ob-goal-inp{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.2em;color:var(--crimson);background:transparent;border:1px solid transparent;border-radius:6px;width:54px;text-align:left;padding:2px 4px;outline:none;-moz-appearance:textfield;transition:all .15s}
-.ob-goal-inp:hover{border-color:var(--line);background:var(--panel2)}
-.ob-goal-inp:focus{border-color:var(--crimson);background:var(--panel2)}
-.ob-goal-inp::-webkit-outer-spin-button,.ob-goal-inp::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.ob-pct{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.95em;letter-spacing:.04em;color:var(--text);padding:4px 11px;border-radius:99px;background:var(--panel2);border:1px solid var(--line)}
-.ob-pct.full{color:var(--green);background:var(--green-l);border-color:var(--green-b)}
-.ob-pct.over{color:var(--amber);background:var(--amber-l);border-color:var(--amber-b)}
-.ob-bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:16px;position:relative}
-.ob-bar-fill{height:100%;background:linear-gradient(90deg,var(--crimson),var(--blue));border-radius:99px;transition:width .8s cubic-bezier(.2,.9,.3,1);position:relative}
-.ob-bar-fill.full{background:linear-gradient(90deg,var(--green) 0%,#FFD700 50%,var(--green) 100%);background-size:200% 100%;animation:ob-shimmer 2.5s linear infinite}
-@keyframes ob-shimmer{from{background-position:0% 0%}to{background-position:200% 0%}}
-
-.ob-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
-.ob-card{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 8px 10px;border-radius:var(--rl);border:1px solid var(--line);background:var(--panel2);position:relative;transition:border-color .25s,box-shadow .25s}
-.ob-card.mine{border-color:var(--crimson);box-shadow:0 0 0 3px var(--crimson-l)}
-.ob-card.mine::after{content:'YOU';position:absolute;top:-8px;right:10px;font-family:'Barlow Condensed',sans-serif;font-size:.58em;font-weight:800;letter-spacing:.18em;padding:2px 8px;background:var(--crimson);color:white;border-radius:99px;box-shadow:0 2px 4px rgba(0,0,0,.1)}
-.ob-csr-name{font-family:'Barlow Condensed',sans-serif;font-size:.78em;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.ob-btn{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,var(--crimson),var(--crimson-d));border:none;color:white;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transition:transform .12s ease,box-shadow .2s;box-shadow:0 4px 14px rgba(119,10,10,.25),inset 0 -3px 0 rgba(0,0,0,.15);position:relative;overflow:hidden;user-select:none;-webkit-tap-highlight-color:transparent}
-.ob-btn:hover{box-shadow:0 6px 22px rgba(119,10,10,.38),inset 0 -3px 0 rgba(0,0,0,.15)}
-.ob-btn:active{transform:scale(.92);box-shadow:0 2px 6px rgba(119,10,10,.25),inset 0 -2px 0 rgba(0,0,0,.15)}
-.ob-count{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:2.3em;line-height:1;display:block}
-.ob-tap{font-family:'Barlow',sans-serif;font-size:.72em;font-weight:400;font-style:italic;letter-spacing:-.01em;text-transform:lowercase;opacity:.5;margin-top:1px}
-.ob-undo{font-family:'Barlow Condensed',sans-serif;font-size:.66em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:none;border:none;color:var(--dim);cursor:pointer;padding:3px 10px;border-radius:var(--r);transition:all .15s}
-.ob-undo:hover{color:var(--red);background:var(--red-l)}
-.ob-undo:disabled{opacity:.3;cursor:not-allowed}
-@keyframes ob-bounce{0%{transform:scale(.92)}35%{transform:scale(1.08)}70%{transform:scale(.98)}100%{transform:scale(1)}}
-@keyframes ob-ping{0%{transform:scale(1)}30%{transform:scale(1.25);color:#FFF7AA}100%{transform:scale(1);color:white}}
-.ob-btn.ob-bouncing{animation:ob-bounce .38s cubic-bezier(.34,1.56,.64,1)}
-.ob-btn.ob-bouncing .ob-count{animation:ob-ping .38s ease}
-
-/* CELEBRATION */
-.ob-confetti{position:fixed;width:9px;height:14px;border-radius:2px;pointer-events:none;z-index:9999;left:0;top:0;will-change:transform,opacity}
-@keyframes ob-fly{0%{transform:translate(var(--sx),var(--sy)) rotate(0);opacity:1}100%{transform:translate(calc(var(--sx) + var(--dx)),calc(var(--sy) + var(--dy))) rotate(var(--rot));opacity:0}}
-.ob-ticker.celebrating{animation:ob-celebrate .8s ease}
-@keyframes ob-celebrate{0%,100%{transform:scale(1)}25%{transform:scale(1.015)}50%{transform:scale(.995)}75%{transform:scale(1.008)}}
-
-/* THEME OVERRIDES */
-body.mode-dark .ob-btn{background:linear-gradient(135deg,var(--blue),#5a8cc7);color:#0F0F0F;box-shadow:0 4px 18px rgba(142,190,239,.3),inset 0 -3px 0 rgba(0,0,0,.25)}
-body.mode-dark .ob-btn:hover{box-shadow:0 6px 26px rgba(142,190,239,.45),inset 0 -3px 0 rgba(0,0,0,.25)}
-body.mode-dark .ob-card.mine{box-shadow:0 0 0 3px rgba(142,190,239,.25)}
-body.mode-dark .ob-card.mine::after{background:var(--blue);color:#0F0F0F}
-
-body.mode-fun .ob-ticker{background:rgba(46,15,82,.85);border-color:rgba(233,30,140,.25);border-radius:18px;backdrop-filter:blur(4px)}
-body.mode-fun .ob-btn{background:linear-gradient(135deg,#E91E8C,#C471ED);box-shadow:0 0 30px rgba(233,30,140,.4),inset 0 -3px 0 rgba(0,0,0,.2)}
-body.mode-fun .ob-btn:hover{box-shadow:0 0 40px rgba(233,30,140,.6),inset 0 -3px 0 rgba(0,0,0,.2)}
-body.mode-fun .ob-card{background:rgba(26,5,48,.5);border-color:rgba(233,30,140,.2);border-radius:18px}
-body.mode-fun .ob-card.mine{border-color:#E91E8C;box-shadow:0 0 0 3px rgba(233,30,140,.3),0 0 25px rgba(233,30,140,.25)}
-body.mode-fun .ob-card.mine::after{background:linear-gradient(90deg,#E91E8C,#C471ED);border-radius:99px}
-body.mode-fun .ob-bar-fill{background:linear-gradient(90deg,#E91E8C,#C471ED,#FF9DDB)}
-body.mode-fun .ob-bar-fill.full{background:linear-gradient(90deg,#FFD700,#FF9DDB,#E91E8C,#C471ED,#FFD700);background-size:200% 100%}
-body.mode-fun .ob-total{color:#FF9DDB}
-body.mode-fun .ob-total.full{color:#A8E063}
-body.mode-fun .ob-goal-inp{color:#FF9DDB}
-body.mode-fun .ob-pct{background:rgba(233,30,140,.12);border-color:rgba(233,30,140,.3);color:#FF9DDB}
-
-@media(min-width:560px){
-  .ob-btn{width:104px;height:104px}
-  .ob-count{font-size:2.5em}
-}
-@media(min-width:900px){
-  .ob-ticker{padding:18px 22px 20px}
-  .ob-btn{width:124px;height:124px}
-  .ob-count{font-size:2.9em}
-  .ob-csr-name{font-size:.92em;letter-spacing:.16em}
-  .ob-total{font-size:2em}
-  .ob-label{font-size:.82em;letter-spacing:.16em}
-  .ob-pct{font-size:1.05em;padding:5px 14px}
-  .ob-goal-inp{font-size:1.5em;width:64px}
-  .ob-buttons{gap:16px}
-  .ob-card{padding:18px 10px 12px}
-}
 </style>
 </head>
 <body>
@@ -606,10 +524,7 @@ body.mode-fun .ob-pct{background:rgba(233,30,140,.12);border-color:rgba(233,30,1
       <div id="view-callboard" class="view active">
         <div class="eyebrow">Live Board</div>
         <div class="page-title">3-Day Call Board</div>
-        <p class="page-copy">Outbound counter at the top — tap your button for every callback or follow-up call. Scheduling board for the next <span id="dayCountLabel">3</span> business days below. Click a tech name to mark them unavailable; hover a cell to cross out a single day.</p>
-
-        <!-- outbound call ticker -->
-        <div class="ob-ticker" id="obTicker"></div>
+        <p class="page-copy">Scheduling board for the next <span id="dayCountLabel">3</span> business days. Click a tech name to mark them unavailable for all visible days. Hover a cell to cross out a specific day.</p>
 
         <!-- goals strip -->
         <div class="cb-goals-strip">
@@ -705,11 +620,6 @@ body.mode-fun .ob-pct{background:rgba(233,30,140,.12);border-color:rgba(233,30,1
         <div class="stg-section-title">Technician Names</div>
         <div id="stgTechList"></div>
         <button class="stg-add-btn" onclick="stgAddTech()">+ Add Technician</button>
-      </div>
-      <div class="stg-section">
-        <div class="stg-section-title">CSR Names (Outbound Counter)</div>
-        <div id="stgCsrList"></div>
-        <button class="stg-add-btn" onclick="stgAddCsr()">+ Add CSR</button>
       </div>
       <div class="stg-section">
         <div class="stg-section-title">Days on Call Board</div>
@@ -812,7 +722,6 @@ function handleCred(resp){
 }
 function showErr(m){var e=document.getElementById('loginErr');e.textContent=m;e.classList.add('show');}
 function bootApp(name,pic){
-  sessionUserName=name||'';
   var av=document.getElementById('uAv');
   if(pic)av.innerHTML='<img src="'+pic+'" referrerpolicy="no-referrer">';
   else av.textContent=name.charAt(0).toUpperCase();
@@ -1037,9 +946,7 @@ function initCB(){
   var cfg=loadConfig();
   CB_TECHS=cfg.techs||CB_TECHS;
   numDays=cfg.numDays||3;
-  loadObConfig();
   computeDays();startListeners();listenGoals();listenConfig();listenBoard();fetchWeather();fetchWeekAndRender();scheduleMidnight();
-  renderObTicker();listenObSettings();listenObToday();scheduleObMidnight();
 }
 function reinitCB(){computeDays();renderCB();fetchWeather();fetchWeekAndRender();}
 function goDefault(){cbAnchor=nextBizFrom(new Date());reinitCB();}
@@ -1130,16 +1037,13 @@ function saveBoardState(){
 
 // ── SETTINGS MODAL ──
 var stgTechs=[];
-var stgCsrs=[];
 var stgDays=3;
 
 function openSettings(){
   var cfg=loadConfig();
   stgTechs=cfg.techs.slice();
-  stgCsrs=CB_CSRS.slice();
   stgDays=cfg.numDays||3;
   renderStgTechs();
-  renderStgCsrs();
   document.getElementById('stgDaysVal').textContent=stgDays;
   document.getElementById('stgSaved').style.display='none';
   document.getElementById('stgBack').classList.add('open');
@@ -1164,29 +1068,7 @@ function renderStgTechs(){
 
 function stgAddTech(){
   stgTechs.push('');renderStgTechs();
-  var inputs=document.querySelectorAll('#stgTechList .stg-inp');
-  if(inputs.length) inputs[inputs.length-1].focus();
-}
-
-function renderStgCsrs(){
-  var list=document.getElementById('stgCsrList');
-  if(!list)return;
-  list.innerHTML='';
-  stgCsrs.forEach(function(name,i){
-    var row=document.createElement('div');row.className='stg-row';
-    var inp=document.createElement('input');
-    inp.className='stg-inp';inp.type='text';inp.value=name;inp.placeholder='CSR first name';
-    inp.oninput=(function(idx){return function(){stgCsrs[idx]=this.value.trim();};})(i);
-    var del=document.createElement('button');
-    del.className='stg-del-btn';del.innerHTML='&#x2715;';del.title='Remove';
-    del.onclick=(function(idx){return function(){stgCsrs.splice(idx,1);renderStgCsrs();};})(i);
-    row.appendChild(inp);row.appendChild(del);list.appendChild(row);
-  });
-}
-
-function stgAddCsr(){
-  stgCsrs.push('');renderStgCsrs();
-  var inputs=document.querySelectorAll('#stgCsrList .stg-inp');
+  var inputs=document.querySelectorAll('.stg-inp');
   if(inputs.length) inputs[inputs.length-1].focus();
 }
 
@@ -1198,27 +1080,18 @@ function stgChangeDays(n){
 function saveSettings(){
   var cleanTechs=stgTechs.filter(function(t){return t.trim().length>0;});
   if(!cleanTechs.length){alert('Add at least one technician.');return;}
-  var cleanCsrs=stgCsrs.filter(function(t){return t.trim().length>0;});
-  if(!cleanCsrs.length){alert('Add at least one CSR.');return;}
   var cfg={techs:cleanTechs,numDays:stgDays};
   // Always save locally first — works even without Firestore
   saveConfigLocal(cfg);
   CB_TECHS=cleanTechs;
   if(!weekView) numDays=stgDays;
-  // CSRs
-  var csrsChanged=JSON.stringify(CB_CSRS)!==JSON.stringify(cleanCsrs);
-  CB_CSRS=cleanCsrs;
-  localStorage.setItem(CSRS_KEY,JSON.stringify(CB_CSRS));
-  if(csrsChanged){obStructureBuilt=false;renderObTicker();}
   var el=document.getElementById('stgSaved');
   function onSaved(){
     if(el){el.style.display='block';setTimeout(function(){el.style.display='none';closeSettings();reinitCB();},1200);}
   }
   // Try Firestore — silently fall back if it fails
-  Promise.all([
-    db.collection('ppw_settings').doc('config').set(cfg),
-    db.collection('ppw_settings').doc('outbound').set({csrs:CB_CSRS,goal:obGoal},{merge:true})
-  ]).then(onSaved)
+  db.collection('ppw_settings').doc('config').set(cfg)
+    .then(onSaved)
     .catch(function(e){
       console.warn('Firestore config save failed, using local only:',e);
       onSaved(); // still close and apply — local save is enough
@@ -1586,225 +1459,6 @@ function delAppt(){
   var tech=mState.tech,ds=mState.ds,apptId=mState.apptId;
   setAppts(ds,tech,getAppts(ds,tech).filter(function(a){return a.id!==apptId;}));
   scheduleSave(ds);closeModal();renderCB();
-}
-
-// ═══════════════════════
-// OUTBOUND CALL TICKER
-// ═══════════════════════
-var CB_CSRS=['Mollie','Ashley'];
-var CSRS_KEY='ppw_csrs_v1';
-var OB_GOAL_KEY='ppw_ob_goal_v1';
-var obGoal=60;
-var obCounts={};        // {Ashley: 12, Mollie: 8}
-var obToday='';
-var obStructureBuilt=false;
-var sessionUserName=null;
-var obMidnightTimer=null;
-
-function loadObConfig(){
-  try{var g=parseInt(localStorage.getItem(OB_GOAL_KEY));if(g>0)obGoal=g;}catch(e){}
-  try{var c=JSON.parse(localStorage.getItem(CSRS_KEY));if(Array.isArray(c)&&c.length)CB_CSRS=c;}catch(e){}
-}
-
-function saveObGoalRemote(){
-  db.collection('ppw_settings').doc('outbound').set({goal:obGoal,csrs:CB_CSRS},{merge:true})
-    .then(function(){setSyncSt('saved');})
-    .catch(function(e){console.warn('OB goal save failed:',e);setSyncSt('err');});
-}
-
-function listenObSettings(){
-  db.collection('ppw_settings').doc('outbound').onSnapshot(function(snap){
-    if(snap.exists){
-      var d=snap.data(),changed=false;
-      if(typeof d.goal==='number'&&d.goal>0&&d.goal!==obGoal){obGoal=d.goal;localStorage.setItem(OB_GOAL_KEY,obGoal);changed=true;}
-      if(Array.isArray(d.csrs)&&d.csrs.length){
-        var newCsrs=d.csrs.filter(function(c){return c&&c.trim();});
-        if(newCsrs.length&&JSON.stringify(newCsrs)!==JSON.stringify(CB_CSRS)){
-          CB_CSRS=newCsrs;localStorage.setItem(CSRS_KEY,JSON.stringify(CB_CSRS));
-          obStructureBuilt=false;changed=true;
-        }
-      }
-      if(changed)renderObTicker();
-    }
-  },function(e){console.warn('OB settings listener error:',e);});
-}
-
-function listenObToday(){
-  obToday=dateKey(new Date());
-  db.collection('ppw_outbound').doc(obToday).onSnapshot(function(snap){
-    obCounts=snap.exists?(snap.data().counts||{}):{};
-    updateObValues();
-    checkObCelebration();
-  },function(e){console.warn('OB today listener error:',e);});
-}
-
-function deriveCsrFromUser(){
-  try{
-    var s=JSON.parse(sessionStorage.getItem(SESS_KEY));
-    if(!s)return null;
-    var firstName=(s.name||'').split(' ')[0].trim();
-    var email=(s.email||'').toLowerCase();
-    var prefix=email.split('@')[0].replace(/[^a-z]/g,'');
-    for(var i=0;i<CB_CSRS.length;i++){
-      if(CB_CSRS[i].toLowerCase()===firstName.toLowerCase())return CB_CSRS[i];
-    }
-    for(var j=0;j<CB_CSRS.length;j++){
-      if(prefix.indexOf(CB_CSRS[j].toLowerCase())===0)return CB_CSRS[j];
-    }
-    return null;
-  }catch(e){return null;}
-}
-
-function bumpOb(csr,delta){
-  delta=delta||1;
-  // Switch document if midnight rolled over since last tap
-  var nowKey=dateKey(new Date());
-  if(nowKey!==obToday){obToday=nowKey;obCounts={};listenObToday();}
-  obCounts[csr]=Math.max(0,(obCounts[csr]||0)+delta);
-  updateObValues();
-  // Bounce only on increment
-  if(delta>0){
-    var btn=document.getElementById('ob-btn-'+cssId(csr));
-    if(btn){
-      btn.classList.remove('ob-bouncing');
-      void btn.offsetWidth;
-      btn.classList.add('ob-bouncing');
-    }
-  }
-  db.collection('ppw_outbound').doc(obToday).set({
-    counts:obCounts,
-    lastUpdate:firebase.firestore.FieldValue.serverTimestamp(),
-    lastBy:sessionUserName||'',
-    lastCsr:csr
-  },{merge:true}).then(function(){setSyncSt('saved');})
-   .catch(function(e){console.warn('OB save failed:',e);setSyncSt('err');});
-  checkObCelebration();
-}
-
-function updateObGoal(v){
-  var n=Math.max(1,parseInt(v)||1);
-  if(n===obGoal)return;
-  obGoal=n;
-  localStorage.setItem(OB_GOAL_KEY,obGoal);
-  saveObGoalRemote();
-  updateObValues();
-}
-
-function cssId(s){return String(s).replace(/[^a-zA-Z0-9_-]/g,'_');}
-
-function buildObStructure(){
-  var wrap=document.getElementById('obTicker');if(!wrap)return;
-  var myCsr=deriveCsrFromUser();
-  var html=
-    '<div class="ob-head">'+
-      '<div class="ob-title">'+
-        '<span class="ob-label">Outbound Calls Today</span>'+
-        '<span class="ob-total" id="obTotal">0</span>'+
-        '<span class="ob-slash">/</span>'+
-        '<input class="ob-goal-inp" id="obGoalInp" type="number" min="1" max="999" value="'+obGoal+'" '+
-        'onchange="updateObGoal(this.value)" onblur="updateObGoal(this.value)" '+
-        'onkeydown="if(event.key===\'Enter\')this.blur()" title="Click to change daily goal">'+
-      '</div>'+
-      '<div class="ob-pct" id="obPct">0%</div>'+
-    '</div>'+
-    '<div class="ob-bar"><div class="ob-bar-fill" id="obBarFill" style="width:0%"></div></div>'+
-    '<div class="ob-buttons">';
-  CB_CSRS.forEach(function(csr){
-    var safeId=cssId(csr);
-    var mine=myCsr&&csr.toLowerCase()===myCsr.toLowerCase();
-    html+=
-      '<div class="ob-card'+(mine?' mine':'')+'">'+
-        '<div class="ob-csr-name">'+csr+'</div>'+
-          '<button class="ob-btn" id="ob-btn-'+safeId+'" onclick="bumpOb(\''+csr.replace(/'/g,"\\'")+'\',1)" title="Tap for every outbound call">'+
-            '<span class="ob-count" id="ob-count-'+safeId+'">0</span>'+
-            '<span class="ob-tap">wow.</span>'+
-          '</button>'+
-        '<button class="ob-undo" id="ob-undo-'+safeId+'" onclick="bumpOb(\''+csr.replace(/'/g,"\\'")+'\',-1)" title="Undo last">−1</button>'+
-      '</div>';
-  });
-  html+='</div>';
-  wrap.innerHTML=html;
-  obStructureBuilt=true;
-}
-
-function renderObTicker(){
-  if(!obStructureBuilt)buildObStructure();
-  updateObValues();
-}
-
-function updateObValues(){
-  if(!obStructureBuilt){buildObStructure();}
-  var total=CB_CSRS.reduce(function(n,c){return n+(obCounts[c]||0);},0);
-  var pct=obGoal>0?Math.round((total/obGoal)*100):0;
-  var totalEl=document.getElementById('obTotal');
-  if(totalEl){totalEl.textContent=total;totalEl.classList.toggle('full',pct>=100);}
-  var pctEl=document.getElementById('obPct');
-  if(pctEl){
-    pctEl.textContent=pct+'%';
-    pctEl.classList.toggle('full',pct>=100&&pct<=110);
-    pctEl.classList.toggle('over',pct>110);
-  }
-  var barEl=document.getElementById('obBarFill');
-  if(barEl){barEl.style.width=Math.min(100,pct)+'%';barEl.classList.toggle('full',pct>=100);}
-  var gInp=document.getElementById('obGoalInp');
-  if(gInp&&document.activeElement!==gInp)gInp.value=obGoal;
-  CB_CSRS.forEach(function(csr){
-    var el=document.getElementById('ob-count-'+cssId(csr));
-    if(el)el.textContent=obCounts[csr]||0;
-    var undo=document.getElementById('ob-undo-'+cssId(csr));
-    if(undo)undo.disabled=!(obCounts[csr]>0);
-  });
-}
-
-function checkObCelebration(){
-  var total=CB_CSRS.reduce(function(n,c){return n+(obCounts[c]||0);},0);
-  var celebKey='ppw_ob_celeb_'+obToday;
-  if(total>=obGoal&&obGoal>0&&!sessionStorage.getItem(celebKey)){
-    sessionStorage.setItem(celebKey,'1');
-    fireConfetti();
-  }
-}
-
-function fireConfetti(){
-  var container=document.getElementById('obTicker');
-  if(!container)return;
-  container.classList.remove('celebrating');
-  void container.offsetWidth;
-  container.classList.add('celebrating');
-  setTimeout(function(){container.classList.remove('celebrating');},900);
-  var rect=container.getBoundingClientRect();
-  var cx=rect.left+rect.width/2;
-  var cy=rect.top+rect.height/2;
-  var colors=['#770A0A','#8EBEEF','#2E7D52','#FFD700','#E91E8C','#FF9DDB','#A8E063','#C471ED'];
-  var count=window.innerWidth<560?40:70;
-  for(var i=0;i<count;i++){
-    var p=document.createElement('div');
-    p.className='ob-confetti';
-    var angle=(Math.PI*2*i)/count + (Math.random()-.5)*.3;
-    var dist=140+Math.random()*260;
-    p.style.background=colors[i%colors.length];
-    p.style.setProperty('--sx',cx+'px');
-    p.style.setProperty('--sy',cy+'px');
-    p.style.setProperty('--dx',(Math.cos(angle)*dist)+'px');
-    p.style.setProperty('--dy',(Math.sin(angle)*dist+Math.random()*150)+'px');
-    p.style.setProperty('--rot',(Math.random()*1080-540)+'deg');
-    p.style.animation='ob-fly '+(1.1+Math.random()*.8)+'s cubic-bezier(.2,.7,.3,1) forwards';
-    document.body.appendChild(p);
-    (function(el){setTimeout(function(){el.remove();},2000);})(p);
-  }
-}
-
-function scheduleObMidnight(){
-  if(obMidnightTimer)clearTimeout(obMidnightTimer);
-  var now=new Date();
-  var mid=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,5);
-  obMidnightTimer=setTimeout(function(){
-    obToday=dateKey(new Date());
-    obCounts={};
-    updateObValues();
-    listenObToday();
-    scheduleObMidnight();
-  },mid-now);
 }
 
 // ═══════════════════════
