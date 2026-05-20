@@ -331,10 +331,13 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
 .cb-gfill{height:100%;background:var(--crimson);border-radius:99px;transition:width .7s ease;opacity:.7}
 .cb-gcnt{font-family:'Barlow Condensed',sans-serif;font-size:.68em;font-weight:700;color:var(--crimson);min-width:28px;text-align:right}
 
-.cb-tech-cell{display:flex;align-items:flex-start;padding-top:10px}
+.cb-tech-cell{display:flex;flex-direction:column;align-items:flex-start;padding-top:10px;gap:3px}
 .cb-tech-lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82em;letter-spacing:.05em;color:var(--text);text-transform:uppercase;cursor:pointer;padding:2px 4px;border-radius:var(--r);border:1px solid transparent;transition:all .2s;user-select:none;line-height:1.3;word-break:break-word}
 .cb-tech-lbl:hover{border-color:var(--line);background:var(--panel2)}
 .cb-tech-lbl.out{color:var(--red);text-decoration:line-through;opacity:.5}
+.cb-conv{font-family:'Barlow Condensed',sans-serif;font-size:.7em;font-weight:700;letter-spacing:.06em;color:var(--muted);padding:0 4px;white-space:nowrap}
+.cb-conv.hot{color:var(--green)}
+.cb-conv.cold{color:var(--red)}
 
 .cb-acell{background:var(--panel);border:1px solid var(--line);border-radius:var(--rl);padding:6px;min-height:62px;transition:border-color .2s;position:relative}
 .cb-acell:hover{border-color:#C5BAB0}
@@ -358,6 +361,7 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
 .cb-token.p{background:var(--amber-l);border-color:var(--amber-b)}
 .cb-token.x{background:var(--red-l);border-color:var(--red-b);opacity:.7}
 .cb-pdot{position:absolute;bottom:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:var(--crimson);border:1.5px solid var(--panel)}
+.cb-sold-badge{position:absolute;top:-5px;left:50%;transform:translateX(-50%);font-size:.62em;line-height:1;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}
 .cb-token[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--text);color:white;font-family:'Barlow Condensed',sans-serif;font-size:.68em;white-space:nowrap;padding:3px 7px;border-radius:var(--r);z-index:20;pointer-events:none}
 .cb-add{width:26px;height:26px;border-radius:50%;background:transparent;border:1.5px dashed var(--dim);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.88em;transition:all .2s;flex-shrink:0}
 .cb-add:hover{border-color:var(--crimson);color:var(--crimson);background:var(--crimson-l)}
@@ -676,6 +680,14 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
         <div class="cb-ptog" id="pTog" onclick="toggleP()"><div class="cb-pind"></div><span class="cb-ptxt">Mark as priority follow-up</span></div>
       </div>
       <div class="field"><label class="label">Notes</label><textarea class="input" id="fNo" rows="2" placeholder="Optional notes…"></textarea></div>
+      <div class="field">
+        <label class="label">Outcome</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+          <button class="cb-sbut" id="soldBtn-yes"   onclick="setSold('yes')">👍 Sold</button>
+          <button class="cb-sbut" id="soldBtn-no"    onclick="setSold('no')">👎 No Sale</button>
+          <button class="cb-sbut" id="soldBtn-none"  onclick="setSold(null)">— Pending</button>
+        </div>
+      </div>
     </div>
     <div class="cb-mfoot">
       <button class="cb-mbtn cb-bsave" onclick="saveAppt()">Save</button>
@@ -793,6 +805,7 @@ var cbOutDays={};
 var mState=null;
 var mStat='scheduled';
 var mPrio=false;
+var mSold=null; // null=pending, 'yes'=sold, 'no'=no sale
 var weatherCache={}; // dateStr -> {icon, temp}
 
 // ── WEATHER ──
@@ -1324,7 +1337,25 @@ function renderCBGrid(){
     var lbl=document.createElement('span');lbl.className='cb-tech-lbl'+(isOut?' out':'');
     lbl.textContent=tech;lbl.title=isOut?'Restore '+tech:'Mark '+tech+' unavailable';
     lbl.onclick=(function(t){return function(){toggleTech(t);};})(tech);
-    tc.appendChild(lbl);grid.appendChild(tc);
+    tc.appendChild(lbl);
+    // Conversion rate across all visible days
+    var totalJobs=0,soldJobs=0;
+    cbDays.forEach(function(d){
+      getAppts(dateKey(d),tech).forEach(function(a){
+        if(a.status!=='cancelled'){totalJobs++;if(a.sold==='yes')soldJobs++;}
+      });
+    });
+    var convEl=document.createElement('div');
+    convEl.title='Conversion: jobs sold vs total booked';
+    if(totalJobs>0){
+      var convPct=Math.round((soldJobs/totalJobs)*100);
+      convEl.className='cb-conv'+(convPct>=70?' hot':convPct<40?' cold':'');
+      convEl.textContent=soldJobs+'/'+totalJobs+' ('+convPct+'%)';
+    }else{
+      convEl.className='cb-conv';convEl.textContent='\u2014';
+    }
+    tc.appendChild(convEl);
+    grid.appendChild(tc);
     cbDays.forEach(function(d){
       var ds=dateKey(d),isPast=ds<todayKey;
       var isNext=ds===dateKey(nextBizFrom(new Date()));
@@ -1352,12 +1383,36 @@ function renderCBGrid(){
   });
 }
 
+function setSold(v){mSold=v;refreshSold();}
+function refreshSold(){
+  ['yes','no','none'].forEach(function(k){
+    var b=document.getElementById('soldBtn-'+k);
+    if(!b)return;
+    var match=(k==='none'&&mSold===null)||(k===mSold);
+    b.classList.toggle('on',match);
+    if(match){
+      b.classList.remove('on-green','on-red');
+      if(k==='yes')b.classList.add('on-green');
+      else if(k==='no')b.classList.add('on-red');
+    }else{
+      b.classList.remove('on-green','on-red');
+    }
+  });
+}
+
 function mkToken(a,tech,ds){
   var tok=document.createElement('div');
   var sc=a.status==='completed'?'c':a.status==='pending'?'p':a.status==='cancelled'?'x':'s';
   tok.className='cb-token '+sc;
-  if(a.status==='cancelled')tok.innerHTML='<span class="cb-tx">&#x2715;</span>';
-  else{var f=a.status==='completed'?'&#128522;':a.status==='pending'?'&#128528;':'&#9786;';tok.innerHTML='<span class="cb-tsm">'+f+'</span>';}
+  if(a.status==='cancelled'){
+    tok.innerHTML='<span class="cb-tx">&#x2715;</span>';
+  }else{
+    var f=a.status==='completed'?'&#128522;':a.status==='pending'?'&#128528;':'&#9786;';
+    tok.innerHTML='<span class="cb-tsm">'+f+'</span>';
+    // Sold badge
+    if(a.sold==='yes')  tok.innerHTML+='<span class="cb-sold-badge">👍</span>';
+    else if(a.sold==='no') tok.innerHTML+='<span class="cb-sold-badge">👎</span>';
+  }
   if(a.priority)tok.innerHTML+='<div class="cb-pdot"></div>';
   var tip=[a.name,a.phone].filter(Boolean).join(' \u00b7 ');
   if(tip)tok.dataset.tip=tip;
@@ -1433,13 +1488,13 @@ function openModal(tech,ds,apptId){
     if(!appt)return;
     document.getElementById('mTi').textContent='Edit Appointment';
     document.getElementById('fNm').value=appt.name||'';document.getElementById('fPh').value=appt.phone||'';document.getElementById('fNo').value=appt.notes||'';
-    setSt(appt.status);mPrio=appt.priority;document.getElementById('bDel').style.display='';
+    setSt(appt.status);mPrio=appt.priority;mSold=appt.sold||null;document.getElementById('bDel').style.display='';
   }else{
     document.getElementById('mTi').textContent='New Appointment';
     document.getElementById('fNm').value=document.getElementById('fPh').value=document.getElementById('fNo').value='';
-    setSt('scheduled');mPrio=false;
+    setSt('scheduled');mPrio=false;mSold=null;
   }
-  refreshP();mState={tech:tech,ds:ds,apptId:apptId};
+  refreshP();refreshSold();mState={tech:tech,ds:ds,apptId:apptId};
   document.getElementById('mBack').classList.add('open');
   setTimeout(function(){document.getElementById('fNm').focus();},50);
 }
@@ -1453,7 +1508,7 @@ function saveAppt(){
   if(!mState)return;
   var tech=mState.tech,ds=mState.ds,apptId=mState.apptId;
   var arr=getAppts(ds,tech).slice();
-  var data={name:document.getElementById('fNm').value.trim(),phone:document.getElementById('fPh').value.trim(),notes:document.getElementById('fNo').value.trim(),status:mStat,priority:mPrio};
+  var data={name:document.getElementById('fNm').value.trim(),phone:document.getElementById('fPh').value.trim(),notes:document.getElementById('fNo').value.trim(),status:mStat,priority:mPrio,sold:mSold};
   if(apptId!==null){var idx=arr.findIndex(function(a){return a.id===apptId;});if(idx>-1)arr[idx]=Object.assign({},arr[idx],data);}
   else{data.id=uid();arr.push(data);}
   setAppts(ds,tech,arr);scheduleSave(ds);closeModal();renderCB();
