@@ -331,10 +331,13 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
 .cb-gfill{height:100%;background:var(--crimson);border-radius:99px;transition:width .7s ease;opacity:.7}
 .cb-gcnt{font-family:'Barlow Condensed',sans-serif;font-size:.68em;font-weight:700;color:var(--crimson);min-width:28px;text-align:right}
 
-.cb-tech-cell{display:flex;align-items:flex-start;padding-top:10px}
+.cb-tech-cell{display:flex;flex-direction:column;align-items:flex-start;padding-top:10px;gap:3px}
 .cb-tech-lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82em;letter-spacing:.05em;color:var(--text);text-transform:uppercase;cursor:pointer;padding:2px 4px;border-radius:var(--r);border:1px solid transparent;transition:all .2s;user-select:none;line-height:1.3;word-break:break-word}
 .cb-tech-lbl:hover{border-color:var(--line);background:var(--panel2)}
 .cb-tech-lbl.out{color:var(--red);text-decoration:line-through;opacity:.5}
+.cb-conv{font-family:'Barlow Condensed',sans-serif;font-size:.7em;font-weight:700;letter-spacing:.06em;color:var(--muted);padding:0 4px;white-space:nowrap}
+.cb-conv.hot{color:var(--green)}
+.cb-conv.cold{color:var(--red)}
 
 .cb-acell{background:var(--panel);border:1px solid var(--line);border-radius:var(--rl);padding:6px;min-height:62px;transition:border-color .2s;position:relative}
 .cb-acell:hover{border-color:#C5BAB0}
@@ -358,6 +361,7 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
 .cb-token.p{background:var(--amber-l);border-color:var(--amber-b)}
 .cb-token.x{background:var(--red-l);border-color:var(--red-b);opacity:.7}
 .cb-pdot{position:absolute;bottom:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:var(--crimson);border:1.5px solid var(--panel)}
+.cb-sold-badge{position:absolute;top:-5px;left:50%;transform:translateX(-50%);font-size:.62em;line-height:1;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}
 .cb-token[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--text);color:white;font-family:'Barlow Condensed',sans-serif;font-size:.68em;white-space:nowrap;padding:3px 7px;border-radius:var(--r);z-index:20;pointer-events:none}
 .cb-add{width:26px;height:26px;border-radius:50%;background:transparent;border:1.5px dashed var(--dim);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.88em;transition:all .2s;flex-shrink:0}
 .cb-add:hover{border-color:var(--crimson);color:var(--crimson);background:var(--crimson-l)}
@@ -442,38 +446,83 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
 /* ── TABLET 560px+ ── */
 @media(min-width:560px){
   .main{padding:16px}
-  .cb-board{grid-template-columns:80px repeat(3,1fr);gap:5px 8px}
-  .cb-totals{grid-template-columns:80px repeat(3,1fr)}
-  .cb-mval{font-size:1.7em}
-  .cb-mlbl{font-size:.68em}
-  .cb-token{width:34px;height:34px}
-  .cb-tsm{font-size:1.1em}
-  .cb-acell{min-height:70px;padding:7px}
-  .cb-add{width:28px;height:28px}
-  .cb-date{font-size:1.2em}
+  .cb-board{grid-template-columns:90px repeat(3,1fr);gap:6px 10px}
+  .cb-totals{grid-template-columns:90px repeat(3,1fr)}
+  .cb-mval{font-size:1.9em}
+  .cb-mlbl{font-size:.72em}
+  .cb-token{width:38px;height:38px}
+  .cb-tsm{font-size:1.25em}
+  .cb-acell{min-height:80px;padding:8px}
+  .cb-add{width:32px;height:32px}
+  .cb-date{font-size:1.3em}
   .cb-sbuts{grid-template-columns:repeat(4,1fr)}
+  .cb-tech-lbl{font-size:.92em}
+  .cb-conv{font-size:.74em}
 }
 
 /* ── DESKTOP 900px+ ── */
 @media(min-width:900px){
-  .main{padding:22px}
-  .cb-board{grid-template-columns:100px repeat(3,1fr);gap:6px 12px}
-  .cb-totals{grid-template-columns:100px repeat(3,1fr)}
-  .cb-mval{font-size:1.9em}
-  .cb-mlbl{font-size:.78em;letter-spacing:.1em}
-  .cb-metric{padding:12px 14px}
-  .cb-token{width:38px;height:38px}
-  .cb-tsm{font-size:1.2em}
-  .cb-acell{min-height:78px;padding:9px}
-  .cb-add{width:32px;height:32px;font-size:1em}
-  .cb-date{font-size:1.3em}
-  .cb-weather{font-size:.9em}
-  .cb-tcnt{font-size:1.45em}
-  .cb-gcnt{font-size:.72em;min-width:32px}
-  .cb-tech-lbl{font-size:.9em}
-  .topbar{padding:14px 24px}
-  .tb-name{font-size:1.4em}
+  html{font-size:16px}
+  .main{padding:20px 28px}
+  .cb-board{grid-template-columns:120px repeat(3,1fr);gap:8px 14px}
+  .cb-totals{grid-template-columns:120px repeat(3,1fr);gap:8px 14px}
+  .cb-mval{font-size:2.4em}
+  .cb-mlbl{font-size:.82em;letter-spacing:.1em}
+  .cb-metric{padding:14px 18px}
+  .cb-metrics{margin-bottom:16px}
+  .cb-token{width:48px;height:48px}
+  .cb-tsm{font-size:1.55em}
+  .cb-tx{font-size:1.2em}
+  .cb-sold-badge{font-size:.75em;top:-6px}
+  .cb-add{width:40px;height:40px;font-size:1.2em}
+  .cb-acell{min-height:100px;padding:10px}
+  .cb-trow{gap:6px;min-height:52px}
+  .cb-date{font-size:1.7em}
+  .cb-weather{font-size:1.0em}
+  .cb-eyebrow{font-size:.78em;letter-spacing:.14em}
+  .cb-tcnt{font-size:1.8em}
+  .cb-tgoal{font-size:.9em}
+  .cb-gcnt{font-size:.82em;min-width:36px}
+  .cb-glbl{font-size:.76em}
+  .cb-tech-lbl{font-size:1.05em;letter-spacing:.06em;padding:3px 6px}
+  .cb-conv{font-size:.8em}
+  .cb-tech-cell{gap:5px;padding-top:14px}
+  .cb-goal-row{margin-top:6px}
+  .cb-gbar{height:4px}
+  .topbar{padding:14px 28px}
+  .tb-name{font-size:1.5em;letter-spacing:.16em}
   .tb-right{gap:10px}
+  .cb-nav{gap:8px;margin-bottom:14px}
+  .cb-nbtn{width:32px;height:32px;font-size:1.05em}
+  .cb-range{font-size:1.15em}
+  .cb-today-btn{font-size:.82em;padding:6px 14px}
+  .cb-goals-btn{font-size:.82em;padding:6px 13px}
+  .cb-goals-strip{margin-bottom:16px}
+  .cb-gs-cell{padding:13px 18px}
+  .cb-gs-val{font-size:2.0em}
+  .cb-gs-label{font-size:.76em;letter-spacing:.14em}
+  .cb-gs-goal{font-size:.88em}
+  .cb-footer{margin-top:14px;padding-top:12px}
+  .cb-li{font-size:.82em;gap:7px}
+  .cb-ld{width:10px;height:10px}
+  .cb-clbl{font-size:.82em}
+  .cb-cval{font-size:1.05em}
+  .cb-cbar{width:80px}
+  .page-title{font-size:2.1em}
+  .page-copy{font-size:.9em}
+}
+
+/* ── WIDE DESKTOP 1300px+ ── */
+@media(min-width:1300px){
+  .main{padding:22px 40px}
+  .cb-board{grid-template-columns:130px repeat(3,1fr);gap:10px 18px}
+  .cb-totals{grid-template-columns:130px repeat(3,1fr);gap:10px 18px}
+  .cb-token{width:52px;height:52px}
+  .cb-tsm{font-size:1.65em}
+  .cb-acell{min-height:110px;padding:12px}
+  .cb-trow{gap:8px}
+  .cb-tech-lbl{font-size:1.1em}
+  .cb-date{font-size:1.9em}
 }
 </style>
 </head>
@@ -525,6 +574,15 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
         <div class="eyebrow">Live Board</div>
         <div class="page-title">3-Day Call Board</div>
         <p class="page-copy">Scheduling board for the next <span id="dayCountLabel">3</span> business days. Click a tech name to mark them unavailable for all visible days. Hover a cell to cross out a specific day.</p>
+
+        <!-- metrics -->
+        <div class="cb-metrics">
+          <div class="cb-metric"><div class="cb-mval b" id="m0">0</div><div class="cb-mlbl">Total Apps</div></div>
+          <div class="cb-metric"><div class="cb-mval g" id="m1">0</div><div class="cb-mlbl">Completed</div></div>
+          <div class="cb-metric"><div class="cb-mval a" id="m2">0</div><div class="cb-mlbl">Pending</div></div>
+          <div class="cb-metric"><div class="cb-mval r" id="m3">0</div><div class="cb-mlbl">Cancelled</div></div>
+          <div class="cb-metric"><div class="cb-mval"   id="m4">0</div><div class="cb-mlbl">Priority F/U</div></div>
+        </div>
 
         <!-- goals strip -->
         <div class="cb-goals-strip">
@@ -667,6 +725,16 @@ body.mode-fun .stg-save-btn{background:linear-gradient(90deg,#E91E8C,#C471ED)}
         <div class="cb-ptog" id="pTog" onclick="toggleP()"><div class="cb-pind"></div><span class="cb-ptxt">Mark as priority follow-up</span></div>
       </div>
       <div class="field"><label class="label">Notes</label><textarea class="input" id="fNo" rows="2" placeholder="Optional notes…"></textarea></div>
+      <div class="field">
+        <label class="label">Outcome</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <button class="cb-sbut" id="soldBtn-yes"      onclick="setSold('yes')">👍 Sold</button>
+          <button class="cb-sbut" id="soldBtn-presold"  onclick="setSold('presold')">💰 Pre-Sold</button>
+          <button class="cb-sbut" id="soldBtn-no"       onclick="setSold('no')">👎 No Sale</button>
+          <button class="cb-sbut" id="soldBtn-callback" onclick="setSold('callback')">💩 Callback</button>
+          <button class="cb-sbut" id="soldBtn-none"     onclick="setSold(null)">— Pending</button>
+        </div>
+      </div>
     </div>
     <div class="cb-mfoot">
       <button class="cb-mbtn cb-bsave" onclick="saveAppt()">Save</button>
@@ -784,6 +852,7 @@ var cbOutDays={};
 var mState=null;
 var mStat='scheduled';
 var mPrio=false;
+var mSold=null; // null=pending, 'yes'=sold, 'no'=no sale
 var weatherCache={}; // dateStr -> {icon, temp}
 
 // ── WEATHER ──
@@ -1275,14 +1344,11 @@ function renderCB(){
 }
 
 function updateGridCols(){
-  var techW = numDays>4 ? '60px' : numDays>3 ? '70px' : '80px';
-  var cols = techW+' repeat('+numDays+',1fr)';
-  ['cbDayCols','cbGrid'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(el) el.style.gridTemplateColumns=cols;
-  });
-  var tot=document.getElementById('cbTotals');
-  if(tot) tot.style.gridTemplateColumns=cols;
+  var w=window.innerWidth;
+  var techW=w>=1300?'130px':w>=900?'120px':w>=560?'90px':numDays>4?'60px':'68px';
+  var cols=techW+' repeat('+numDays+',1fr)';
+  ['cbDayCols','cbGrid'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.gridTemplateColumns=cols;});
+  var tot=document.getElementById('cbTotals');if(tot)tot.style.gridTemplateColumns=cols;
 }
 
 function renderCBHeaders(){
@@ -1315,7 +1381,31 @@ function renderCBGrid(){
     var lbl=document.createElement('span');lbl.className='cb-tech-lbl'+(isOut?' out':'');
     lbl.textContent=tech;lbl.title=isOut?'Restore '+tech:'Mark '+tech+' unavailable';
     lbl.onclick=(function(t){return function(){toggleTech(t);};})(tech);
-    tc.appendChild(lbl);grid.appendChild(tc);
+    tc.appendChild(lbl);
+    // Conversion rate across all visible days
+    var totalJobs=0,soldJobs=0,callbacks=0;
+    cbDays.forEach(function(d){
+      getAppts(dateKey(d),tech).forEach(function(a){
+        if(a.status!=='cancelled'){
+          totalJobs++;
+          if(a.sold==='yes'||a.sold==='presold') soldJobs++;
+          if(a.sold==='callback') callbacks++;
+        }
+      });
+    });
+    var convEl=document.createElement('div');
+    convEl.title='Conversion: sold vs total booked';
+    if(totalJobs>0){
+      var convPct=Math.round((soldJobs/totalJobs)*100);
+      convEl.className='cb-conv'+(convPct>=70?' hot':convPct<40?' cold':'');
+      var txt=soldJobs+'/'+totalJobs+' ('+convPct+'%)';
+      if(callbacks>0) txt+=' 💩'+callbacks;
+      convEl.textContent=txt;
+    }else{
+      convEl.className='cb-conv';convEl.textContent='\u2014';
+    }
+    tc.appendChild(convEl);
+    grid.appendChild(tc);
     cbDays.forEach(function(d){
       var ds=dateKey(d),isPast=ds<todayKey;
       var isNext=ds===dateKey(nextBizFrom(new Date()));
@@ -1343,12 +1433,38 @@ function renderCBGrid(){
   });
 }
 
+function setSold(v){mSold=v;refreshSold();}
+function refreshSold(){
+  var map={
+    'yes':     {cls:'on-green', id:'soldBtn-yes'},
+    'presold': {cls:'on-green', id:'soldBtn-presold'},
+    'no':      {cls:'on-red',   id:'soldBtn-no'},
+    'callback':{cls:'on-amber', id:'soldBtn-callback'},
+    'none':    {cls:'',         id:'soldBtn-none'}
+  };
+  Object.keys(map).forEach(function(k){
+    var b=document.getElementById(map[k].id);
+    if(!b)return;
+    var isActive=(k==='none'&&mSold===null)||(k===mSold);
+    b.className='cb-sbut'+(isActive?' on '+map[k].cls:'');
+  });
+}
+
 function mkToken(a,tech,ds){
   var tok=document.createElement('div');
   var sc=a.status==='completed'?'c':a.status==='pending'?'p':a.status==='cancelled'?'x':'s';
   tok.className='cb-token '+sc;
-  if(a.status==='cancelled')tok.innerHTML='<span class="cb-tx">&#x2715;</span>';
-  else{var f=a.status==='completed'?'&#128522;':a.status==='pending'?'&#128528;':'&#9786;';tok.innerHTML='<span class="cb-tsm">'+f+'</span>';}
+  if(a.status==='cancelled'){
+    tok.innerHTML='<span class="cb-tx">&#x2715;</span>';
+  }else{
+    var f=a.status==='completed'?'&#128522;':a.status==='pending'?'&#128528;':'&#9786;';
+    tok.innerHTML='<span class="cb-tsm">'+f+'</span>';
+    // Sold badge
+    if(a.sold==='yes')       tok.innerHTML+='<span class="cb-sold-badge">👍</span>';
+    else if(a.sold==='presold')  tok.innerHTML+='<span class="cb-sold-badge">💰</span>';
+    else if(a.sold==='no')       tok.innerHTML+='<span class="cb-sold-badge">👎</span>';
+    else if(a.sold==='callback') tok.innerHTML+='<span class="cb-sold-badge">💩</span>';
+  }
   if(a.priority)tok.innerHTML+='<div class="cb-pdot"></div>';
   var tip=[a.name,a.phone].filter(Boolean).join(' \u00b7 ');
   if(tip)tok.dataset.tip=tip;
@@ -1369,14 +1485,10 @@ function renderCBTotals(){
 function renderCBMetrics(){
   var total=0,comp=0,pend=0,canc=0,prio=0;
   cbDays.forEach(function(d){var ds=dateKey(d);CB_TECHS.forEach(function(t){getAppts(ds,t).forEach(function(a){total++;if(a.status==='completed')comp++;if(a.status==='pending')pend++;if(a.status==='cancelled')canc++;if(a.priority)prio++;});});});
-  var m0=document.getElementById('m0');if(m0)m0.textContent=total;
-  var m1=document.getElementById('m1');if(m1)m1.textContent=comp;
-  var m2=document.getElementById('m2');if(m2)m2.textContent=pend;
-  var m3=document.getElementById('m3');if(m3)m3.textContent=canc;
-  var m4=document.getElementById('m4');if(m4)m4.textContent=prio;
+  document.getElementById('m0').textContent=total;document.getElementById('m1').textContent=comp;
+  document.getElementById('m2').textContent=pend;document.getElementById('m3').textContent=canc;document.getElementById('m4').textContent=prio;
   var rate=total>0?((canc/total)*100).toFixed(1):0;
-  var cR=document.getElementById('cRate');if(cR)cR.textContent=rate+'%';
-  var cB=document.getElementById('cBar');if(cB)cB.style.width=Math.min(100,rate)+'%';
+  document.getElementById('cRate').textContent=rate+'%';document.getElementById('cBar').style.width=Math.min(100,rate)+'%';
 }
 
 // drawer
@@ -1428,13 +1540,13 @@ function openModal(tech,ds,apptId){
     if(!appt)return;
     document.getElementById('mTi').textContent='Edit Appointment';
     document.getElementById('fNm').value=appt.name||'';document.getElementById('fPh').value=appt.phone||'';document.getElementById('fNo').value=appt.notes||'';
-    setSt(appt.status);mPrio=appt.priority;document.getElementById('bDel').style.display='';
+    setSt(appt.status);mPrio=appt.priority;mSold=appt.sold||null;refreshP();refreshSold();document.getElementById('bDel').style.display='';
   }else{
     document.getElementById('mTi').textContent='New Appointment';
     document.getElementById('fNm').value=document.getElementById('fPh').value=document.getElementById('fNo').value='';
-    setSt('scheduled');mPrio=false;
+    setSt('scheduled');mPrio=false;mSold=null;refreshP();refreshSold();
   }
-  refreshP();mState={tech:tech,ds:ds,apptId:apptId};
+  mState={tech:tech,ds:ds,apptId:apptId};
   document.getElementById('mBack').classList.add('open');
   setTimeout(function(){document.getElementById('fNm').focus();},50);
 }
@@ -1448,7 +1560,7 @@ function saveAppt(){
   if(!mState)return;
   var tech=mState.tech,ds=mState.ds,apptId=mState.apptId;
   var arr=getAppts(ds,tech).slice();
-  var data={name:document.getElementById('fNm').value.trim(),phone:document.getElementById('fPh').value.trim(),notes:document.getElementById('fNo').value.trim(),status:mStat,priority:mPrio};
+  var data={name:document.getElementById('fNm').value.trim(),phone:document.getElementById('fPh').value.trim(),notes:document.getElementById('fNo').value.trim(),status:mStat,priority:mPrio,sold:mSold};
   if(apptId!==null){var idx=arr.findIndex(function(a){return a.id===apptId;});if(idx>-1)arr[idx]=Object.assign({},arr[idx],data);}
   else{data.id=uid();arr.push(data);}
   setAppts(ds,tech,arr);scheduleSave(ds);closeModal();renderCB();
