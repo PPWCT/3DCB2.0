@@ -530,9 +530,6 @@ body.fun .tb-btn,body.fun .theme-btn{border-color:rgba(236,31,146,.3);border-rad
     <p class="lp">Sign in with your authorized PPW Google account.</p>
     <div id="gsi_btn"></div>
     <div class="lerr" id="loginErr"></div>
-    <div class="l-fallback" id="loginFallback">
-      Sign-in requires <strong>ppwct.github.io</strong>. Open via <a href="https://ppwct.github.io/3DCB2.0/" style="color:var(--cr)">ppwct.github.io/3DCB2.0</a>
-    </div>
     <div class="lnotice">Restricted to PPW team members only.</div>
   </div>
 </div>
@@ -941,20 +938,13 @@ function bootApp(name,pic){
 }
 function signOut(){sessionStorage.removeItem(SESS_KEY);stopListeners();if(typeof google!=='undefined')google.accounts.id.disableAutoSelect();location.reload();}
 window.addEventListener('load',function(){
-  var storedTheme=localStorage.getItem('ppw_werks_v2')||localStorage.getItem('ppw_werks_theme')||localStorage.getItem('ppw_cmd_theme')||'light';
-  applyTheme(storedTheme);
-  var s=getSess();if(s){bootApp(s.name,s.pic);return;}
+  var s=getSess();
+  if(s){bootApp(s.name,s.pic);return;}
   var try_=function(){
     if(typeof google==='undefined'){setTimeout(try_,150);return;}
     google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleCred,auto_select:false});
     google.accounts.id.renderButton(document.getElementById('gsi_btn'),{theme:'outline',size:'large',width:280,text:'signin_with',shape:'rectangular'});
     google.accounts.id.prompt();
-    /* Show fallback hint if button didn't render (unauthorized origin) */
-    setTimeout(function(){
-      var btn=document.getElementById('gsi_btn');
-      var fb=document.getElementById('loginFallback');
-      if(fb&&btn&&btn.children.length===0){fb.style.display='block';}
-    },2500);
   };
   try_();
 });
@@ -973,6 +963,7 @@ function applyTheme(t){
   var btn=document.getElementById('themeBtn');if(btn)btn.innerHTML=TI[t]||'☀️';
 }
 function cycleTheme(){var next=THEMES[(THEMES.indexOf(currentTheme)+1)%THEMES.length];localStorage.setItem(TK,next);applyTheme(next);}
+applyTheme(localStorage.getItem('ppw_werks_v2')||localStorage.getItem('ppw_cmd_theme')||currentTheme);
 
 /* ═══ ACCORDION: PRIORITY ═══════════════════════════ */
 /* Track layout mode so we handle resize correctly */
