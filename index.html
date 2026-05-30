@@ -133,6 +133,7 @@ body.fun .tb-btn,body.fun .theme-btn{border-color:rgba(236,31,146,.3);border-rad
 .lerr{font-size:.78em;font-weight:500;color:var(--rd);background:var(--rd-l);border:1px solid var(--rd-b);border-radius:var(--r);padding:9px 14px;width:100%;display:none;margin-top:12px;text-align:center}
 .lerr.show{display:block}
 .lnotice{font-size:.7em;color:var(--dim);text-align:center;margin-top:14px}
+.l-fallback{font-size:.7em;color:var(--dim);text-align:center;margin-top:10px;line-height:1.55;display:none}
 
 /* ── APP SHELL ─────────────────────────────────────── */
 #appShell{display:none;height:100%;flex-direction:column}
@@ -529,6 +530,9 @@ body.fun .tb-btn,body.fun .theme-btn{border-color:rgba(236,31,146,.3);border-rad
     <p class="lp">Sign in with your authorized PPW Google account.</p>
     <div id="gsi_btn"></div>
     <div class="lerr" id="loginErr"></div>
+    <div class="l-fallback" id="loginFallback">
+      Sign-in requires <strong>ppwct.github.io</strong>. Open via <a href="https://ppwct.github.io/3DCB2.0/" style="color:var(--cr)">ppwct.github.io/3DCB2.0</a>
+    </div>
     <div class="lnotice">Restricted to PPW team members only.</div>
   </div>
 </div>
@@ -937,21 +941,20 @@ function bootApp(name,pic){
 }
 function signOut(){sessionStorage.removeItem(SESS_KEY);stopListeners();if(typeof google!=='undefined')google.accounts.id.disableAutoSelect();location.reload();}
 window.addEventListener('load',function(){
-  /* Read theme directly — avoids TK hoisting issue */
   var storedTheme=localStorage.getItem('ppw_werks_v2')||localStorage.getItem('ppw_werks_theme')||localStorage.getItem('ppw_cmd_theme')||'light';
   applyTheme(storedTheme);
   var s=getSess();if(s){bootApp(s.name,s.pic);return;}
-  var gsiReady=false;
   var try_=function(){
-    if(typeof google==='undefined'||typeof google.accounts==='undefined'){setTimeout(try_,100);return;}
-    if(gsiReady)return;gsiReady=true;
+    if(typeof google==='undefined'){setTimeout(try_,150);return;}
     google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleCred,auto_select:false});
-    /* 120ms delay lets fixed/flex container fully paint before GSI measures it */
+    google.accounts.id.renderButton(document.getElementById('gsi_btn'),{theme:'outline',size:'large',width:280,text:'signin_with',shape:'rectangular'});
+    google.accounts.id.prompt();
+    /* Show fallback hint if button didn't render (unauthorized origin) */
     setTimeout(function(){
       var btn=document.getElementById('gsi_btn');
-      if(btn){google.accounts.id.renderButton(btn,{theme:'outline',size:'large',width:260,text:'signin_with',shape:'rectangular'});}
-      google.accounts.id.prompt();
-    },120);
+      var fb=document.getElementById('loginFallback');
+      if(fb&&btn&&btn.children.length===0){fb.style.display='block';}
+    },2500);
   };
   try_();
 });
