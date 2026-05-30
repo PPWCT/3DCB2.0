@@ -10,8 +10,8 @@
 <style>
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{height:100%;-webkit-text-size-adjust:100%;font-size:14px}
-body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;height:100%;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);color:var(--tx)}
+html{font-size:15px;-webkit-text-size-adjust:100%}
+body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);color:var(--tx)}
 
 /* ── LIGHT ─────────────────────────────────────────── */
 :root{
@@ -121,8 +121,8 @@ body.fun .pi-col.p4 .pi-acc-hdr-bar{background:rgba(236,31,146,.4)}
 body.fun .tb-btn,body.fun .theme-btn{border-color:rgba(236,31,146,.3);border-radius:18px}
 
 /* ── LOGIN ─────────────────────────────────────────── */
-#loginScreen{position:fixed;inset:0;z-index:2000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
-.lcard{background:var(--surf);border:1px solid var(--line);border-radius:18px;padding:44px 40px 36px;width:380px;max-width:100%;box-shadow:var(--sh2);display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden}
+#loginScreen{position:fixed;inset:0;z-index:2000;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.lcard{background:var(--surf);border:1px solid var(--line);border-radius:20px;padding:48px 44px 42px;width:420px;max-width:calc(100vw - 32px);box-shadow:0 8px 40px rgba(0,0,0,.1);display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden}
 .lcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--cr)}
 .llogo{font-size:1.6em;font-weight:700;letter-spacing:.18em;color:var(--cr);text-transform:uppercase;margin-bottom:2px}
 .lsub{font-size:.68em;font-weight:500;letter-spacing:.22em;color:var(--mu);text-transform:uppercase;margin-bottom:26px}
@@ -136,7 +136,7 @@ body.fun .tb-btn,body.fun .theme-btn{border-color:rgba(236,31,146,.3);border-rad
 .l-fallback{font-size:.7em;color:var(--dim);text-align:center;margin-top:10px;line-height:1.55;display:none}
 
 /* ── APP SHELL ─────────────────────────────────────── */
-#appShell{display:none;height:100%;flex-direction:column}
+#appShell{display:none;min-height:100vh;flex-direction:column}
 #appShell.active{display:flex}
 
 /* ── TOPBAR ────────────────────────────────────────── */
@@ -182,10 +182,10 @@ body.fun .tb-btn,body.fun .theme-btn{border-color:rgba(236,31,146,.3);border-rad
 .tab-icon{font-size:1em}
 
 /* ── LAYOUT ────────────────────────────────────────── */
-.main{flex:1;overflow:hidden;position:relative;min-height:0}
+.main{flex:1;overflow:hidden;position:relative}
 .view{position:absolute;inset:0;overflow-y:auto;padding:10px;display:none;-webkit-overflow-scrolling:touch}
 .view.active{display:block}
-.view.noscroll{overflow:hidden;padding:0;display:none}
+.view.noscroll{overflow:hidden;padding:0;display:none;height:calc(100vh - var(--topH) - var(--tabH))}
 .view.noscroll.active{display:flex;flex-direction:column}
 
 /* ── CALL BOARD ────────────────────────────────────── */
@@ -526,11 +526,11 @@ body.fun .tb-btn,body.fun .theme-btn{border-color:rgba(236,31,146,.3);border-rad
     <div class="llogo">The Werks</div>
     <div class="lsub">Prestige Plumbing Werks</div>
     <div class="lrule"></div>
-    <div class="lhead">Team Access</div>
+    <div class="lhead">Call Board Access</div>
     <p class="lp">Sign in with your authorized PPW Google account.</p>
     <div id="gsi_btn"></div>
     <div class="lerr" id="loginErr"></div>
-    <div class="lnotice">Restricted to PPW team members only.</div>
+    <div class="lnotice">Access restricted to PPW team members.</div>
   </div>
 </div>
 
@@ -901,7 +901,7 @@ body.fun .tb-btn,body.fun .theme-btn{border-color:rgba(236,31,146,.3);border-rad
 /* ═══ CONFIG ════════════════════════════════════════ */
 var GOOGLE_CLIENT_ID='177483906229-svdtnrt10irden7gs0abqi5aevnc6u9h.apps.googleusercontent.com';
 var ALLOWED_EMAILS=['business@prestigeplumbingwerks.com','mollieo@prestigeplumbingwerks.com','georgeb@prestigeplumbingwerks.com','lauren@ppwct.com','shea@prestigeplumbingwerks.com','lauren@prestigeplumbingwerks.com','ashley@prestigeplumbingwerks.com','anthony@prestigeplumbingwerks.com','joe@prestigeplumbingwerks.com','tyler@prestigeplumbingwerks.com','zach@prestigeplumbingwerks.com'];
-var SESSION_HOURS=10,SESS_KEY='ppw_sess_v4';
+var SESSION_HOURS=10,SESS_KEY='ppw_sess_v3';
 var FB_CONFIG={apiKey:"AIzaSyDoXQ3gyyGtnMH4265cnQRXl86gbzdiaaw",authDomain:"dcb-493917.firebaseapp.com",projectId:"dcb-493917",storageBucket:"dcb-493917.firebasestorage.app",messagingSenderId:"177483906229",appId:"1:177483906229:web:ce0852d713ceaae3e592fc"};
 
 /* ─── Paste Tech Debrief URL here when ready ─── */
@@ -928,10 +928,8 @@ function bootApp(name,pic){
   else av.textContent=name.charAt(0).toUpperCase();
   document.getElementById('uNm').textContent=name.split(' ')[0];
   document.getElementById('loginScreen').style.display='none';
-  var shell=document.getElementById('appShell');shell.style.display='flex';shell.classList.add('active');
-  /* Migrate old theme key */
-  if(!localStorage.getItem(TK)&&localStorage.getItem('ppw_werks_theme'))localStorage.setItem(TK,localStorage.getItem('ppw_werks_theme'));
-  if(!localStorage.getItem(TK)&&localStorage.getItem('ppw_cmd_theme'))localStorage.setItem(TK,localStorage.getItem('ppw_cmd_theme'));
+  var shell=document.getElementById('appShell');shell.style.display='block';shell.classList.add('active');
+
   if(DEBRIEF_URL&&DEBRIEF_URL.trim()){var fr=document.getElementById('debriefFrame'),ph=document.getElementById('debriefPh');fr.src=DEBRIEF_URL;fr.style.display='block';if(ph)ph.style.display='none';}
   initPriceCards();
   initCB();
