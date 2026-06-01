@@ -580,9 +580,454 @@ body.mode-dark .pr-card{background:var(--panel);border-color:var(--line)}
 #debriefFrame{width:100%;border:none;min-height:80vh;display:none}
 
 /* ── MAP TAB ── */
+
+  :root {
+    --pipeline-blue:  #8EBEEF;
+    --prestige-crim:  #770A0A;
+    --iron-oxide:     #500707;
+    --near-black:     #1A1A1A;
+    --bone-dry:       #F5F0EB;
+    --ink:            #1A1A1A;
+    --paper:          #F5F0EB;
+    --rule:           rgba(26,26,26,0.18);
+    --rule-soft:      rgba(26,26,26,0.08);
+    --shadow-1:       0 1px 0 rgba(26,26,26,.04), 0 8px 24px -12px rgba(26,26,26,.18);
+    --shadow-2:       0 2px 0 rgba(26,26,26,.04), 0 24px 48px -20px rgba(26,26,26,.28);
+    --serif:          "Playfair Display", "Times New Roman", serif;
+    --cond:           "Barlow Condensed", "Helvetica Neue", Arial, sans-serif;
+    --body:           "Lora", Georgia, serif;
+  }
+
+  * { box-sizing: border-box; }
+  
+  #map-container {
+  button { font-family: inherit; cursor: pointer; }
+
+  .app {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
+    height: 100svh;
+    height: 100dvh;
+  }
+
+  /* HEADER */
+  header.brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 24px;
+    background: var(--near-black);
+    color: var(--bone-dry);
+    border-bottom: 3px solid var(--prestige-crim);
+  }
+  .brand-mark { display: flex; align-items: baseline; gap: 14px; }
+  .brand-mark .ppw {
+    font-family: var(--serif);
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: 0.04em;
+    color: var(--bone-dry);
+  }
+  .brand-mark .ppw em { font-style: italic; color: var(--pipeline-blue); font-weight: 500; }
+  .brand-mark .pipe { width: 1px; height: 22px; background: rgba(245,240,235,.3); }
+  .brand-mark .label {
+    font-family: var(--cond);
+    font-size: 14px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(245,240,235,.7);
+  }
+  header.brand .meta {
+    font-family: var(--cond);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(245,240,235,.55);
+    text-align: right;
+  }
+  header.brand .meta strong { color: var(--bone-dry); font-weight: 500; }
+
+  /* MAP CANVAS */
+  main.canvas {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at top left, rgba(143,190,239,.08), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(119,10,10,.04), transparent 50%),
+      var(--paper);
+  }
+  .map-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; }
+  .map-header {
+    padding: 14px 32px 6px 32px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .map-title {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 0;
+  }
+  .map-subtitle {
+    font-family: var(--cond);
+    font-size: 13px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--iron-oxide);
+    margin-top: 6px;
+  }
+  .map-stats {
+    text-align: right;
+    font-family: var(--cond);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--iron-oxide);
+    line-height: 1.5;
+  }
+  .map-stats strong {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--ink);
+    display: block;
+    letter-spacing: -0.01em;
+  }
+  .svg-stage {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 16px 70px 16px;
+    min-height: 0;
+  }
+  svg.ct-map {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    user-select: none;
+    touch-action: none;
+  }
+  svg.ct-map .town {
+    fill: #ffffff;
+    stroke: var(--near-black);
+    stroke-width: 0.6;
+    stroke-linejoin: round;
+    transition: filter .12s;
+  }
+  body:not(.locked) svg.ct-map { cursor: crosshair; }
+  body:not(.locked) svg.ct-map .town:hover { filter: brightness(0.9); }
+  body.locked svg.ct-map { cursor: grab; }
+  body.locked svg.ct-map.dragging { cursor: grabbing; }
+  svg.ct-map .town-label {
+    font-family: var(--cond);
+    font-weight: 500;
+    fill: var(--near-black);
+    pointer-events: none;
+    user-select: none;
+    text-anchor: middle;
+    paint-order: stroke fill;
+    stroke: rgba(255,255,255,0.85);
+    stroke-width: 2px;
+    stroke-linejoin: round;
+  }
+  svg.ct-map .town-label.on-color {
+    fill: var(--bone-dry);
+    stroke: rgba(0,0,0,0.55);
+  }
+
+  /* MAP FOOTER */
+  .map-foot {
+    padding: 4px 32px 12px 32px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .inline-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 22px;
+    align-items: center;
+  }
+  .inline-legend .item {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--cond);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .inline-legend .sw {
+    width: 14px; height: 14px;
+    border-radius: 2px;
+    border: 1px solid rgba(26,26,26,.25);
+  }
+  .inline-legend .num {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--iron-oxide);
+    font-size: 13px;
+    margin-left: 4px;
+  }
+  .ppw-foot {
+    font-family: var(--cond);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--iron-oxide);
+    text-align: right;
+    line-height: 1.6;
+  }
+  .ppw-foot .a {
+    font-family: var(--serif);
+    font-weight: 700;
+    color: var(--prestige-crim);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 13px;
+  }
+
+  /* FLOATING TOOLBAR */
+  .floating-toolbar {
+    position: absolute;
+    bottom: 26px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--near-black);
+    border-radius: 999px;
+    padding: 5px;
+    box-shadow: var(--shadow-2);
+    z-index: 30;
+    border: 1px solid rgba(245,240,235,.08);
+  }
+  .ft-btn {
+    border: none;
+    background: transparent;
+    color: var(--bone-dry);
+    font-family: var(--cond);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 11px 18px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    transition: background .15s, color .15s;
+    white-space: nowrap;
+  }
+  .ft-btn:hover { background: rgba(245,240,235,.08); }
+  .ft-btn .icon { width: 15px; height: 15px; display: inline-flex; }
+  .ft-btn .icon svg { width: 100%; height: 100%; }
+
+  /* Lock state visual */
+  body.locked .ft-lock { background: var(--prestige-crim); color: var(--bone-dry); }
+  body.locked .ft-lock:hover { background: var(--iron-oxide); }
+  body:not(.locked) .ft-lock { background: var(--pipeline-blue); color: var(--near-black); }
+  body:not(.locked) .ft-lock:hover { background: #B0D2F4; }
+  .ft-lock .open-icon { display: none; }
+  body:not(.locked) .ft-lock .open-icon { display: inline-flex; }
+  body:not(.locked) .ft-lock .closed-icon { display: none; }
+
+  .ft-sep {
+    width: 1px;
+    height: 22px;
+    background: rgba(245,240,235,.15);
+    margin: 0 2px;
+  }
+
+  .ft-swatch {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    margin: 0 2px;
+    transition: transform .12s, border-color .12s;
+    flex-shrink: 0;
+  }
+  .ft-swatch:hover { transform: scale(1.08); }
+  .ft-swatch.active {
+    border-color: var(--bone-dry);
+    box-shadow: 0 0 0 1px var(--near-black) inset;
+  }
+
+  .edit-tools {
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity .2s, transform .2s, max-width .25s;
+    max-width: 0;
+    overflow: hidden;
+  }
+  body:not(.locked) .edit-tools {
+    opacity: 1;
+    transform: translateX(0);
+    max-width: 600px;
+  }
+
+  /* TOOLTIP */
+  .tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--near-black);
+    color: var(--bone-dry);
+    font-family: var(--cond);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 7px 11px;
+    border-radius: 2px;
+    transform: translate(-50%, calc(-100% - 12px));
+    z-index: 50;
+    opacity: 0;
+    transition: opacity .08s;
+    white-space: nowrap;
+    box-shadow: var(--shadow-1);
+  }
+  .tooltip.show { opacity: 1; }
+  .tooltip .name {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--bone-dry);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .tooltip .co { color: var(--pipeline-blue); }
+
+  /* LOADING OVERLAY */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(245,240,235,.92);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 40;
+    backdrop-filter: blur(6px);
+  }
+  .overlay .pulse {
+    width: 56px; height: 56px;
+    border: 2px solid var(--rule);
+    border-top-color: var(--prestige-crim);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 22px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .overlay h3 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 22px;
+    margin: 0 0 8px;
+    color: var(--ink);
+  }
+  .overlay p {
+    font-family: var(--cond);
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--iron-oxide);
+    margin: 0;
+    text-align: center;
+    max-width: 360px;
+  }
+  .overlay.hidden { display: none; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 92px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--near-black);
+    color: var(--bone-dry);
+    padding: 11px 18px;
+    border-radius: 2px;
+    font-family: var(--cond);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity .2s, transform .2s;
+    z-index: 80;
+    box-shadow: var(--shadow-2);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* MOBILE */
+  @media (max-width: 700px) {
+    .map-header { padding: 14px 16px 6px 16px; }
+    .map-foot { padding: 6px 16px 18px 16px; }
+    .map-title { font-size: 22px; }
+    .map-stats strong { font-size: 18px; }
+    header.brand { padding: 12px 16px; }
+    .brand-mark .ppw { font-size: 18px; }
+    header.brand .meta { display: none; }
+    .floating-toolbar { padding: 4px; }
+    .ft-btn { padding: 9px 14px; font-size: 11px; letter-spacing: 0.15em; }
+    .ft-btn .text-long { display: none; }
+    .svg-stage { padding: 4px 8px 90px 8px; }
+  }
+
+  /* PRINT */
+  @media print {
+    @page { size: letter landscape; margin: 0.4in; }
+    
+    #map-container {
+    header.brand, .tooltip, .toast, .overlay, .floating-toolbar { display: none !important; }
+    .app { display: block; height: auto; }
+    main.canvas { background: #fff !important; overflow: visible; height: auto; }
+    .map-wrap { position: static; }
+    .print-brand {
+      display: block !important;
+      margin-bottom: 8px;
+      page-break-after: avoid;
+    }
+    .print-brand .pb-mark { display: flex; align-items: baseline; justify-content: space-between; }
+    .print-brand .pb-ppw {
+      font-family: var(--serif);
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      color: var(--prestige-crim);
+    }
+    .print-brand .pb-ppw em { font-style: italic; font-weight: 500; color: var(--near-black); }
+    .print-brand .pb-rule { height: 1px; background: var(--prestige-crim); margin-top: 4px; }
+    .map-header { padding: 0 0 8px 0; }
+    .map-title { font-size: 24px; }
+    .map-subtitle { font-size: 11px; }
+    .map-stats { font-size: 10px; }
+    .map-stats strong { font-size: 18px; }
+    .svg-stage { padding: 8px 0; min-height: 5.5in; }
+    svg.ct-map { height: auto; max-height: 6in; }
+    .map-foot { padding: 8px 0 0 0; border-top: 1px solid var(--ink); }
+    .inline-legend .item { font-size: 10px; }
+    .ppw-foot { font-size: 9px; }
+  }
+  .print-brand { display: none; }
+
 #view-map{padding:0!important}
 .map-frame{width:100%;border:none;display:block;height:calc(100vh - var(--topbar-h,96px))}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Barlow+Condensed:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -818,8 +1263,792 @@ body.mode-dark .pr-card{background:var(--panel);border-color:var(--line)}
 
 
       <!-- ── TERRITORY MAP ── -->
-      <div id="view-map" class="view">
-        <iframe class="map-frame" src="ppw-territory-map-3.html" allowfullscreen></iframe>
+      <div id="view-map" class="view" style="padding:0;margin:0;overflow:hidden">
+        <div id="map-container" style="height:calc(100vh - 96px);overflow:hidden;position:relative">
+<div class="app">
+
+  <header class="brand">
+    <div class="brand-mark">
+      <div class="ppw">PRESTIGE <em>Plumbing</em> WERKS</div>
+      <div class="pipe"></div>
+      <div class="label">Service Territory</div>
+    </div>
+    <div class="meta">
+      <strong>256 Spielman Hwy · Burlington, CT</strong><br>
+      959.590.8065 · Farmington Valley / Greater Hartford / Litchfield
+    </div>
+  </header>
+
+  <main class="canvas">
+
+    <div class="overlay" id="loading">
+      <div class="pulse"></div>
+      <h3>Loading Connecticut map</h3>
+      <p>One moment.</p>
+    </div>
+
+    <div class="map-wrap">
+      <div class="print-brand">
+        <div class="pb-mark">
+          <span class="pb-ppw">PRESTIGE <em>Plumbing</em> WERKS</span>
+          <span style="font-family:var(--cond); font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--iron-oxide);" id="print-date"></span>
+        </div>
+        <div class="pb-rule"></div>
+      </div>
+
+      <div class="map-header">
+        <div>
+          <h1 class="map-title">Service Territory</h1>
+          <div class="map-subtitle">Connecticut</div>
+        </div>
+        <div class="map-stats">
+          <strong id="stat-colored">58</strong>
+          <span>towns in territory</span>
+        </div>
+      </div>
+
+      <div class="svg-stage">
+        <svg class="ct-map" id="svg" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+
+      <div class="map-foot">
+        <div class="inline-legend" id="display-legend"></div>
+        <div class="ppw-foot">
+          <span class="a">Prestige Plumbing Werks</span><br>
+          256 Spielman Hwy · Burlington · CT 06013 · 959.590.8065
+        </div>
+      </div>
+    </div>
+
+    <div class="floating-toolbar" id="toolbar">
+      <button class="ft-btn ft-lock" id="b-lock" title="Toggle edit mode">
+        <span class="icon closed-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="11" width="16" height="10" rx="2"/>
+            <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+          </svg>
+        </span>
+        <span class="icon open-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="11" width="16" height="10" rx="2"/>
+            <path d="M8 11V7a4 4 0 0 1 8 0"/>
+          </svg>
+        </span>
+        <span class="lock-text">Locked</span>
+      </button>
+
+      <div class="edit-tools">
+        <div class="ft-sep"></div>
+        <div id="swatches" style="display:flex; align-items:center; padding: 0 4px;"></div>
+        <div class="ft-sep"></div>
+        <button class="ft-btn" id="b-undo" title="Undo last change">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 14L4 9l5-5"/>
+              <path d="M4 9h11a5 5 0 0 1 5 5v0a5 5 0 0 1-5 5h-4"/>
+            </svg>
+          </span>
+          <span class="text-long">Undo</span>
+        </button>
+        <button class="ft-btn" id="b-reset" title="Reset to default territory">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 3-6.7"/>
+              <path d="M3 4v5h5"/>
+            </svg>
+          </span>
+          <span class="text-long">Reset</span>
+        </button>
+      </div>
+
+      <div class="ft-sep"></div>
+      <button class="ft-btn" id="b-fit" title="Reset zoom" style="display:none;">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4"/>
+          </svg>
+        </span>
+        <span class="text-long">Reset View</span>
+      </button>
+      <button class="ft-btn" id="b-print" title="Print to PDF">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 9V3h10v6"/>
+            <rect x="4" y="9" width="16" height="9" rx="1"/>
+            <path d="M7 18h10v3H7z"/>
+          </svg>
+        </span>
+        <span class="text-long">Print PDF</span>
+      </button>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+  </main>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===============================================================
+   PPW TERRITORY MAP — minimal UI
+   =============================================================== */
+const STORAGE_KEY = 'ppw_territory_map_v3';
+const GEO_CACHE_KEY = 'ppw_ct_towns_geojson_v2';
+
+const ENDPOINTS = [
+  'https://cdn.jsdelivr.net/gh/HandsOnDataViz/ct-boundaries@main/ct-towns-2022-simple-datactgov.geojson',
+  'https://cdn.jsdelivr.net/gh/HandsOnDataViz/ct-boundaries@main/ct-towns-2024-census.geojson',
+  'https://services1.arcgis.com/FCaUeJ5SOVtImake/arcgis/rest/services/CT_Municipalities/FeatureServer/0/query?where=1%3D1&outFields=Municipality,County&f=geojson&outSR=4326',
+];
+
+const SERVICE_AREA = [
+  'Avon','Barkhamsted','Beacon Falls','Berlin','Bethlehem','Bloomfield','Bristol',
+  'Burlington','Canaan','Canton','Cheshire','Colebrook','Cornwall','Cromwell',
+  'East Granby','Farmington','Glastonbury','Goshen','Granby','Hartland','Harwinton',
+  'Litchfield','Meriden','Middlebury','Middlefield','Middletown','Morris','Naugatuck',
+  'New Britain','New Hartford','Newington','Norfolk','North Canaan','Oxford',
+  'Plainville','Plymouth','Portland','Prospect','Rocky Hill','Roxbury','Simsbury',
+  'Southbury','Southington','Suffield','Thomaston','Torrington','Wallingford',
+  'Warren','Washington','Waterbury','Watertown','West Hartford','Wethersfield',
+  'Winchester','Windsor','Windsor Locks','Wolcott','Woodbury',
+];
+
+const PALETTE = [
+  { color: '#770A0A', label: 'Service Area' },
+  { color: '#8EBEEF', label: 'Active Expansion' },
+  { color: '#E8C547', label: 'Marketing Focus' },
+  { color: '#6B8E5A', label: 'Active Customer' },
+  { color: '#500707', label: 'Outer Reach' },
+];
+
+const state = {
+  geojson: null,
+  towns: [],
+  townByName: {},
+  coloring: {},
+  activeColor: 0,
+  locked: true,
+  history: [],
+  zoom: 1,
+  panX: 0,
+  panY: 0,
+};
+
+const $ = id => document.getElementById(id);
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove('show'), 2000);
+}
+function isLight(hex) {
+  const c = hex.replace('#','');
+  const r = parseInt(c.substr(0,2),16);
+  const g = parseInt(c.substr(2,2),16);
+  const b = parseInt(c.substr(4,2),16);
+  return (0.299*r + 0.587*g + 0.114*b) > 165;
+}
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function normalize(s) {
+  return String(s||'').toLowerCase().replace(/[^a-z]/g, '');
+}
+
+/* LOAD GEOJSON */
+async function loadGeoJSON() {
+  try {
+    const cached = localStorage.getItem(GEO_CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed?.features?.length >= 150) return parsed;
+    }
+  } catch (e) {}
+
+  const tries = ENDPOINTS.map(url => fetchOne(url));
+  const result = await Promise.any(tries).catch(() => null);
+  if (!result) throw new Error('All sources unreachable');
+
+  try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify(result)); } catch(_){}
+  return result;
+}
+async function fetchOne(url) {
+  const ctrl = new AbortController();
+  const tm = setTimeout(() => ctrl.abort(), 20000);
+  try {
+    const res = await fetch(url, { signal: ctrl.signal, cache: 'force-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.features || data.features.length < 150) throw new Error('bad data');
+    return data;
+  } finally {
+    clearTimeout(tm);
+  }
+}
+
+/* PROJECTION */
+function projectGeometry(geojson) {
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  function visit(c){
+    if (typeof c[0]==='number'){
+      if(c[0]<minX)minX=c[0]; if(c[0]>maxX)maxX=c[0];
+      if(c[1]<minY)minY=c[1]; if(c[1]>maxY)maxY=c[1];
+    } else c.forEach(visit);
+  }
+  geojson.features.forEach(f => visit(f.geometry.coordinates));
+  const centerLat = (minY+maxY)/2;
+  const xFactor = Math.cos(centerLat*Math.PI/180);
+  const W=1000,H=620,margin=4;
+  const dx=(maxX-minX)*xFactor, dy=(maxY-minY);
+  const scale = Math.min((W-margin*2)/dx, (H-margin*2)/dy);
+  const offX=(W-dx*scale)/2, offY=(H-dy*scale)/2;
+  return {
+    project: (lng,lat) => [
+      (lng-minX)*xFactor*scale + offX,
+      (maxY-lat)*scale + offY
+    ],
+    W, H
+  };
+}
+function ringToPath(ring, project) {
+  let d='';
+  ring.forEach((p,i) => {
+    const [x,y] = project(p[0],p[1]);
+    d += (i===0?'M':'L') + x.toFixed(2)+','+y.toFixed(2);
+  });
+  return d+'Z';
+}
+function featureToPath(geom, project) {
+  if (geom.type==='Polygon') return geom.coordinates.map(r=>ringToPath(r,project)).join(' ');
+  if (geom.type==='MultiPolygon') return geom.coordinates.flatMap(p=>p.map(r=>ringToPath(r,project))).join(' ');
+  return '';
+}
+function computeCentroid(geom, project) {
+  let rings;
+  if (geom.type==='Polygon') rings = geom.coordinates;
+  else if (geom.type==='MultiPolygon') {
+    let maxLen=0, best=null;
+    geom.coordinates.forEach(p=>p.forEach(r=>{if(r.length>maxLen){maxLen=r.length;best=r;}}));
+    rings=[best];
+  } else return [0,0];
+  const ring = rings[0];
+  let area=0,cx=0,cy=0;
+  for (let i=0;i<ring.length-1;i++) {
+    const [x1,y1]=project(ring[i][0],ring[i][1]);
+    const [x2,y2]=project(ring[i+1][0],ring[i+1][1]);
+    const a=x1*y2-x2*y1;
+    area+=a; cx+=(x1+x2)*a; cy+=(y1+y2)*a;
+  }
+  area/=2;
+  if (Math.abs(area)<1e-6) {
+    let sx=0,sy=0;
+    ring.forEach(p=>{const [x,y]=project(p[0],p[1]); sx+=x; sy+=y;});
+    return [sx/ring.length, sy/ring.length];
+  }
+  return [cx/(6*area), cy/(6*area)];
+}
+function computeBBox(geom, project) {
+  let rings;
+  if (geom.type==='Polygon') rings = geom.coordinates;
+  else if (geom.type==='MultiPolygon') rings = geom.coordinates.flatMap(p=>p);
+  else return [0,0,0,0];
+  let mx=Infinity,my=Infinity,MX=-Infinity,MY=-Infinity;
+  rings.forEach(r=>r.forEach(pt=>{
+    const [x,y]=project(pt[0],pt[1]);
+    if(x<mx)mx=x; if(y<my)my=y;
+    if(x>MX)MX=x; if(y>MY)MY=y;
+  }));
+  return [mx,my,MX-mx,MY-my];
+}
+
+/* BUILD + RENDER */
+function buildTowns() {
+  const { project, W, H } = projectGeometry(state.geojson);
+  state.svgSize = { W, H };
+  state.towns = state.geojson.features.map(f => {
+    const props = f.properties || {};
+    const name = props.Municipality || props.TOWN_NAME || props.TOWN ||
+                 props.NAME || props.name || props.NAMELSAD || props.town ||
+                 props.MunicipalityName || 'Unknown';
+    const county = props.County || props.COUNTY || props.county ||
+                   props.COUNTY_NAME || props.CountyName || '';
+    return {
+      name, county,
+      path: featureToPath(f.geometry, project),
+      centroid: computeCentroid(f.geometry, project),
+      bbox: computeBBox(f.geometry, project),
+    };
+  }).sort((a,b) => a.name.localeCompare(b.name));
+  state.townByName = {};
+  state.towns.forEach(t => state.townByName[t.name] = t);
+}
+
+function renderSVG() {
+  const svg = $('svg');
+  const { W, H } = state.svgSize;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = '';
+
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  defs.innerHTML = `
+    <filter id="paper" x="-2%" y="-2%" width="104%" height="104%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.4"/>
+      <feOffset dx="0" dy="1.5" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  `;
+  svg.appendChild(defs);
+
+  const gShadow = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  gShadow.setAttribute('filter', 'url(#paper)');
+  svg.appendChild(gShadow);
+
+  const gTowns = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  gShadow.appendChild(gTowns);
+  state.towns.forEach(t => {
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', t.path);
+    p.setAttribute('class', 'town');
+    p.dataset.name = t.name;
+    p.dataset.county = t.county;
+    gTowns.appendChild(p);
+  });
+
+  const gLabels = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  svg.appendChild(gLabels);
+  state.towns.forEach(t => {
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('class', 'town-label');
+    text.setAttribute('x', t.centroid[0]);
+    text.setAttribute('y', t.centroid[1]);
+    const w = t.bbox[2];
+    const fs = Math.max(5.2, Math.min(11.5, w * 0.18));
+    text.setAttribute('font-size', fs.toFixed(2));
+    text.textContent = t.name;
+    text.dataset.name = t.name;
+    gLabels.appendChild(text);
+  });
+
+  attachEventHandlers();
+  applyColoringToDOM();
+}
+
+function prefillServiceArea() {
+  const byNorm = {};
+  state.towns.forEach(t => byNorm[normalize(t.name)] = t.name);
+  let matched = 0, missing = [];
+  SERVICE_AREA.forEach(target => {
+    const actual = byNorm[normalize(target)];
+    if (actual) {
+      state.coloring[actual] = 0;
+      matched++;
+    } else {
+      missing.push(target);
+    }
+  });
+  if (missing.length) console.warn('Could not match:', missing);
+  console.log(`Pre-filled ${matched} of ${SERVICE_AREA.length} towns`);
+}
+
+function applyColoringToDOM() {
+  document.querySelectorAll('svg.ct-map .town').forEach(p => {
+    const idx = state.coloring[p.dataset.name];
+    if (idx == null || !PALETTE[idx]) {
+      p.style.fill = '#ffffff';
+      p.dataset.colored = '0';
+    } else {
+      p.style.fill = PALETTE[idx].color;
+      p.dataset.colored = '1';
+    }
+  });
+  document.querySelectorAll('svg.ct-map .town-label').forEach(t => {
+    const idx = state.coloring[t.dataset.name];
+    if (idx != null && PALETTE[idx] && !isLight(PALETTE[idx].color)) {
+      t.classList.add('on-color');
+    } else {
+      t.classList.remove('on-color');
+    }
+  });
+  updateStats();
+  renderInlineLegend();
+}
+
+function colorTown(name, idx) {
+  const prev = state.coloring[name];
+  state.history.push({ name, prev });
+  if (state.history.length > 200) state.history.shift();
+  if (prev === idx) {
+    delete state.coloring[name];
+  } else {
+    if (idx == null) delete state.coloring[name];
+    else state.coloring[name] = idx;
+  }
+  applyColoringToDOM();
+  persist();
+}
+
+function updateStats() {
+  $('stat-colored').textContent = Object.keys(state.coloring).length;
+}
+
+function renderInlineLegend() {
+  const used = new Set(Object.values(state.coloring));
+  const el = $('display-legend');
+  if (used.size === 0) {
+    el.innerHTML = '<span style="font-family:var(--cond); font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--iron-oxide); opacity:0.6;">No towns marked</span>';
+    return;
+  }
+  el.innerHTML = '';
+  PALETTE.forEach((p, i) => {
+    if (!used.has(i)) return;
+    const count = Object.values(state.coloring).filter(v => v === i).length;
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `<span class="sw" style="background:${p.color}"></span> ${escapeHTML(p.label)} <span class="num">${count}</span>`;
+    el.appendChild(item);
+  });
+}
+
+function renderSwatches() {
+  const el = $('swatches');
+  el.innerHTML = '';
+  PALETTE.forEach((p, i) => {
+    const s = document.createElement('div');
+    s.className = 'ft-swatch' + (i === state.activeColor ? ' active' : '');
+    s.style.background = p.color;
+    s.title = p.label;
+    s.dataset.i = i;
+    s.addEventListener('click', () => {
+      state.activeColor = i;
+      renderSwatches();
+    });
+    el.appendChild(s);
+  });
+}
+
+/* ===============================================================
+   ZOOM & PAN
+   =============================================================== */
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function updateViewBox() {
+  const svg = $('svg');
+  if (!state.svgSize) return;
+  const { W, H } = state.svgSize;
+  const vbW = W / state.zoom;
+  const vbH = H / state.zoom;
+  // Clamp pan so we never reveal "off-map" space
+  state.panX = clamp(state.panX, 0, W - vbW);
+  state.panY = clamp(state.panY, 0, H - vbH);
+  svg.setAttribute('viewBox', `${state.panX} ${state.panY} ${vbW} ${vbH}`);
+  $('b-fit').style.display = state.zoom > 1.01 ? '' : 'none';
+}
+
+function clientToSVG(clientX, clientY) {
+  const svg = $('svg');
+  const rect = svg.getBoundingClientRect();
+  const { W, H } = state.svgSize;
+  const vbW = W / state.zoom;
+  const vbH = H / state.zoom;
+  return {
+    x: ((clientX - rect.left) / rect.width) * vbW + state.panX,
+    y: ((clientY - rect.top) / rect.height) * vbH + state.panY,
+  };
+}
+
+function zoomAt(clientX, clientY, factor) {
+  const before = clientToSVG(clientX, clientY);
+  const newZoom = clamp(state.zoom * factor, 1, 10);
+  if (Math.abs(newZoom - state.zoom) < 0.001) return;
+  state.zoom = newZoom;
+  const svg = $('svg');
+  const rect = svg.getBoundingClientRect();
+  const { W, H } = state.svgSize;
+  const newVbW = W / newZoom;
+  const newVbH = H / newZoom;
+  state.panX = before.x - ((clientX - rect.left) / rect.width) * newVbW;
+  state.panY = before.y - ((clientY - rect.top) / rect.height) * newVbH;
+  updateViewBox();
+}
+
+function resetView() {
+  state.zoom = 1;
+  state.panX = 0;
+  state.panY = 0;
+  updateViewBox();
+}
+
+function attachEventHandlers() {
+  const svg = $('svg');
+  const tooltip = $('tooltip');
+  const pointers = new Map();   // pointerId -> { x, y }
+  let mode = null;              // 'paint' | 'pan' | 'pinch'
+  let pinchStart = null;        // { dist, zoom, cx, cy, svgPt }
+  let panStart = null;          // { x, y, panX, panY }
+  let paintedLast = null;
+  let pointerDownTime = 0;
+  let didMove = false;
+
+  function getTown(e) { return e.target.closest('.town'); }
+
+  function startPinch() {
+    const pts = Array.from(pointers.values());
+    const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+    const cx = (pts[0].x + pts[1].x) / 2;
+    const cy = (pts[0].y + pts[1].y) / 2;
+    pinchStart = {
+      dist, cx, cy,
+      zoom: state.zoom,
+      svgPt: clientToSVG(cx, cy),
+    };
+    mode = 'pinch';
+    tooltip.classList.remove('show');
+  }
+
+  function startPan(p) {
+    panStart = { x: p.x, y: p.y, panX: state.panX, panY: state.panY };
+    mode = 'pan';
+    svg.classList.add('dragging');
+    tooltip.classList.remove('show');
+  }
+
+  svg.addEventListener('pointerdown', e => {
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    svg.setPointerCapture(e.pointerId);
+    didMove = false;
+    pointerDownTime = Date.now();
+
+    if (pointers.size === 2) {
+      startPinch();
+      // Cancel any in-progress paint
+      paintedLast = null;
+      return;
+    }
+
+    // Single pointer down
+    if (state.locked) {
+      startPan({ x: e.clientX, y: e.clientY });
+    } else {
+      const t = getTown(e);
+      if (t) {
+        mode = 'paint';
+        paintedLast = t.dataset.name;
+        colorTown(t.dataset.name, state.activeColor);
+      } else {
+        // Unlocked but over empty area — let user pan
+        startPan({ x: e.clientX, y: e.clientY });
+      }
+    }
+  });
+
+  svg.addEventListener('pointermove', e => {
+    if (pointers.has(e.pointerId)) {
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      didMove = true;
+    }
+
+    // Tooltip — only show when not actively manipulating
+    if (!mode || mode === null) {
+      const t = getTown(e);
+      if (t) {
+        tooltip.innerHTML = `<span class="name">${escapeHTML(t.dataset.name)}</span><span class="co">${escapeHTML(t.dataset.county || '')}</span>`;
+        tooltip.style.left = e.clientX + 'px';
+        tooltip.style.top = e.clientY + 'px';
+        tooltip.classList.add('show');
+      } else {
+        tooltip.classList.remove('show');
+      }
+    }
+
+    if (mode === 'pinch' && pointers.size === 2) {
+      const pts = Array.from(pointers.values());
+      const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+      const cx = (pts[0].x + pts[1].x) / 2;
+      const cy = (pts[0].y + pts[1].y) / 2;
+      const factor = dist / pinchStart.dist;
+      const newZoom = clamp(pinchStart.zoom * factor, 1, 10);
+      state.zoom = newZoom;
+      const rect = svg.getBoundingClientRect();
+      const { W, H } = state.svgSize;
+      const newVbW = W / newZoom;
+      const newVbH = H / newZoom;
+      // Keep the *current* pinch center aligned with the original svg point
+      state.panX = pinchStart.svgPt.x - ((cx - rect.left) / rect.width) * newVbW;
+      state.panY = pinchStart.svgPt.y - ((cy - rect.top) / rect.height) * newVbH;
+      updateViewBox();
+    } else if (mode === 'pan' && panStart) {
+      const rect = svg.getBoundingClientRect();
+      const { W, H } = state.svgSize;
+      const vbW = W / state.zoom;
+      const vbH = H / state.zoom;
+      const dx = (e.clientX - panStart.x) / rect.width * vbW;
+      const dy = (e.clientY - panStart.y) / rect.height * vbH;
+      state.panX = panStart.panX - dx;
+      state.panY = panStart.panY - dy;
+      updateViewBox();
+    } else if (mode === 'paint') {
+      const t = getTown(e);
+      if (t && t.dataset.name !== paintedLast) {
+        paintedLast = t.dataset.name;
+        colorTown(t.dataset.name, state.activeColor);
+      }
+    }
+  });
+
+  const endPointer = e => {
+    pointers.delete(e.pointerId);
+    if (pointers.size === 0) {
+      mode = null;
+      paintedLast = null;
+      panStart = null;
+      pinchStart = null;
+      svg.classList.remove('dragging');
+    } else if (pointers.size === 1 && mode === 'pinch') {
+      // Second finger lifted — switch to pan with remaining finger
+      const remaining = Array.from(pointers.values())[0];
+      startPan(remaining);
+    }
+  };
+  svg.addEventListener('pointerup', endPointer);
+  svg.addEventListener('pointercancel', endPointer);
+  svg.addEventListener('pointerleave', e => {
+    tooltip.classList.remove('show');
+  });
+
+  // Mouse wheel zoom (desktop)
+  svg.addEventListener('wheel', e => {
+    e.preventDefault();
+    const factor = e.deltaY < 0 ? 1.18 : 1 / 1.18;
+    zoomAt(e.clientX, e.clientY, factor);
+  }, { passive: false });
+
+  // Double-click / double-tap zoom in
+  svg.addEventListener('dblclick', e => {
+    e.preventDefault();
+    zoomAt(e.clientX, e.clientY, 2);
+  });
+}
+
+function setLocked(locked) {
+  state.locked = locked;
+  document.body.classList.toggle('locked', locked);
+  $('b-lock').querySelector('.lock-text').textContent = locked ? 'Locked' : 'Edit Mode';
+  persist();
+}
+
+function persist() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      coloring: state.coloring,
+      activeColor: state.activeColor,
+      locked: state.locked,
+    }));
+  } catch (e) {}
+}
+function restore() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    if (s.coloring) state.coloring = s.coloring;
+    if (s.activeColor != null) state.activeColor = s.activeColor;
+    if (s.locked != null) state.locked = s.locked;
+    return true;
+  } catch (e) { return false; }
+}
+
+async function boot() {
+  $('b-lock').addEventListener('click', () => setLocked(!state.locked));
+  $('b-undo').addEventListener('click', () => {
+    if (!state.history.length) return;
+    const last = state.history.pop();
+    if (last.prev == null) delete state.coloring[last.name];
+    else state.coloring[last.name] = last.prev;
+    applyColoringToDOM();
+    persist();
+  });
+  $('b-reset').addEventListener('click', () => {
+    if (!confirm('Reset to the default PPW service territory (58 towns)?')) return;
+    state.coloring = {};
+    prefillServiceArea();
+    applyColoringToDOM();
+    persist();
+    toast('Reset to default territory');
+  });
+  $('b-fit').addEventListener('click', resetView);
+  $('b-print').addEventListener('click', () => {
+    // Reset zoom before printing so the full territory prints
+    resetView();
+    const pd = $('print-date');
+    if (pd) {
+      const d = new Date();
+      pd.textContent = 'PREPARED ' + d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }).toUpperCase();
+    }
+    toast('Opening print dialog');
+    setTimeout(() => window.print(), 250);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.target.matches('input,textarea')) return;
+    if ((e.ctrlKey || e.metaKey) && e.key === 'p') { e.preventDefault(); $('b-print').click(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !state.locked) { e.preventDefault(); $('b-undo').click(); }
+    if (e.key === 'l' || e.key === 'L') { $('b-lock').click(); }
+    if (e.key === 'r' || e.key === 'R') { resetView(); }
+    if (e.key === '0') { resetView(); }
+    if (e.key === '+' || e.key === '=') {
+      const r = $('svg').getBoundingClientRect();
+      zoomAt(r.left + r.width/2, r.top + r.height/2, 1.5);
+    }
+    if (e.key === '-' || e.key === '_') {
+      const r = $('svg').getBoundingClientRect();
+      zoomAt(r.left + r.width/2, r.top + r.height/2, 1/1.5);
+    }
+    const n = parseInt(e.key, 10);
+    if (!state.locked && !isNaN(n) && n >= 1 && n <= PALETTE.length) {
+      state.activeColor = n - 1;
+      renderSwatches();
+    }
+  });
+
+  const hadState = restore();
+  setLocked(state.locked);
+  renderSwatches();
+
+  let attempts = 0;
+  while (attempts < 3) {
+    try {
+      state.geojson = await loadGeoJSON();
+      break;
+    } catch (e) {
+      attempts++;
+      if (attempts >= 3) {
+        $('loading').querySelector('.pulse').style.display = 'none';
+        $('loading').querySelector('h3').textContent = "Can't reach map data";
+        $('loading').querySelector('p').innerHTML = 'Check your internet connection and reload.';
+        return;
+      }
+      await new Promise(r => setTimeout(r, 800 * attempts));
+    }
+  }
+
+  buildTowns();
+
+  if (!hadState || Object.keys(state.coloring).length === 0) {
+    prefillServiceArea();
+    persist();
+  }
+
+  renderSVG();
+  $('loading').classList.add('hidden');
+}
+
+boot();
+</script>
+        </div>
       </div>
 
       <!-- ── TECH DEBRIEF ── -->
@@ -1791,6 +3020,671 @@ function cycleTheme(){
 
 // Apply theme immediately to prevent flash
 applyTheme(currentTheme);
+
+// ═══════════════════════
+// TERRITORY MAP
+// ═══════════════════════
+(function() {
+
+/* ===============================================================
+   PPW TERRITORY MAP — minimal UI
+   =============================================================== */
+const STORAGE_KEY = 'ppw_territory_map_v3';
+const GEO_CACHE_KEY = 'ppw_ct_towns_geojson_v2';
+
+const ENDPOINTS = [
+  'https://cdn.jsdelivr.net/gh/HandsOnDataViz/ct-boundaries@main/ct-towns-2022-simple-datactgov.geojson',
+  'https://cdn.jsdelivr.net/gh/HandsOnDataViz/ct-boundaries@main/ct-towns-2024-census.geojson',
+  'https://services1.arcgis.com/FCaUeJ5SOVtImake/arcgis/rest/services/CT_Municipalities/FeatureServer/0/query?where=1%3D1&outFields=Municipality,County&f=geojson&outSR=4326',
+];
+
+const SERVICE_AREA = [
+  'Avon','Barkhamsted','Beacon Falls','Berlin','Bethlehem','Bloomfield','Bristol',
+  'Burlington','Canaan','Canton','Cheshire','Colebrook','Cornwall','Cromwell',
+  'East Granby','Farmington','Glastonbury','Goshen','Granby','Hartland','Harwinton',
+  'Litchfield','Meriden','Middlebury','Middlefield','Middletown','Morris','Naugatuck',
+  'New Britain','New Hartford','Newington','Norfolk','North Canaan','Oxford',
+  'Plainville','Plymouth','Portland','Prospect','Rocky Hill','Roxbury','Simsbury',
+  'Southbury','Southington','Suffield','Thomaston','Torrington','Wallingford',
+  'Warren','Washington','Waterbury','Watertown','West Hartford','Wethersfield',
+  'Winchester','Windsor','Windsor Locks','Wolcott','Woodbury',
+];
+
+const PALETTE = [
+  { color: '#770A0A', label: 'Service Area' },
+  { color: '#8EBEEF', label: 'Active Expansion' },
+  { color: '#E8C547', label: 'Marketing Focus' },
+  { color: '#6B8E5A', label: 'Active Customer' },
+  { color: '#500707', label: 'Outer Reach' },
+];
+
+const state = {
+  geojson: null,
+  towns: [],
+  townByName: {},
+  coloring: {},
+  activeColor: 0,
+  locked: true,
+  history: [],
+  zoom: 1,
+  panX: 0,
+  panY: 0,
+};
+
+const $ = id => document.getElementById(id);
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove('show'), 2000);
+}
+function isLight(hex) {
+  const c = hex.replace('#','');
+  const r = parseInt(c.substr(0,2),16);
+  const g = parseInt(c.substr(2,2),16);
+  const b = parseInt(c.substr(4,2),16);
+  return (0.299*r + 0.587*g + 0.114*b) > 165;
+}
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function normalize(s) {
+  return String(s||'').toLowerCase().replace(/[^a-z]/g, '');
+}
+
+/* LOAD GEOJSON */
+async function loadGeoJSON() {
+  try {
+    const cached = localStorage.getItem(GEO_CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed?.features?.length >= 150) return parsed;
+    }
+  } catch (e) {}
+
+  const tries = ENDPOINTS.map(url => fetchOne(url));
+  const result = await Promise.any(tries).catch(() => null);
+  if (!result) throw new Error('All sources unreachable');
+
+  try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify(result)); } catch(_){}
+  return result;
+}
+async function fetchOne(url) {
+  const ctrl = new AbortController();
+  const tm = setTimeout(() => ctrl.abort(), 20000);
+  try {
+    const res = await fetch(url, { signal: ctrl.signal, cache: 'force-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.features || data.features.length < 150) throw new Error('bad data');
+    return data;
+  } finally {
+    clearTimeout(tm);
+  }
+}
+
+/* PROJECTION */
+function projectGeometry(geojson) {
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  function visit(c){
+    if (typeof c[0]==='number'){
+      if(c[0]<minX)minX=c[0]; if(c[0]>maxX)maxX=c[0];
+      if(c[1]<minY)minY=c[1]; if(c[1]>maxY)maxY=c[1];
+    } else c.forEach(visit);
+  }
+  geojson.features.forEach(f => visit(f.geometry.coordinates));
+  const centerLat = (minY+maxY)/2;
+  const xFactor = Math.cos(centerLat*Math.PI/180);
+  const W=1000,H=620,margin=4;
+  const dx=(maxX-minX)*xFactor, dy=(maxY-minY);
+  const scale = Math.min((W-margin*2)/dx, (H-margin*2)/dy);
+  const offX=(W-dx*scale)/2, offY=(H-dy*scale)/2;
+  return {
+    project: (lng,lat) => [
+      (lng-minX)*xFactor*scale + offX,
+      (maxY-lat)*scale + offY
+    ],
+    W, H
+  };
+}
+function ringToPath(ring, project) {
+  let d='';
+  ring.forEach((p,i) => {
+    const [x,y] = project(p[0],p[1]);
+    d += (i===0?'M':'L') + x.toFixed(2)+','+y.toFixed(2);
+  });
+  return d+'Z';
+}
+function featureToPath(geom, project) {
+  if (geom.type==='Polygon') return geom.coordinates.map(r=>ringToPath(r,project)).join(' ');
+  if (geom.type==='MultiPolygon') return geom.coordinates.flatMap(p=>p.map(r=>ringToPath(r,project))).join(' ');
+  return '';
+}
+function computeCentroid(geom, project) {
+  let rings;
+  if (geom.type==='Polygon') rings = geom.coordinates;
+  else if (geom.type==='MultiPolygon') {
+    let maxLen=0, best=null;
+    geom.coordinates.forEach(p=>p.forEach(r=>{if(r.length>maxLen){maxLen=r.length;best=r;}}));
+    rings=[best];
+  } else return [0,0];
+  const ring = rings[0];
+  let area=0,cx=0,cy=0;
+  for (let i=0;i<ring.length-1;i++) {
+    const [x1,y1]=project(ring[i][0],ring[i][1]);
+    const [x2,y2]=project(ring[i+1][0],ring[i+1][1]);
+    const a=x1*y2-x2*y1;
+    area+=a; cx+=(x1+x2)*a; cy+=(y1+y2)*a;
+  }
+  area/=2;
+  if (Math.abs(area)<1e-6) {
+    let sx=0,sy=0;
+    ring.forEach(p=>{const [x,y]=project(p[0],p[1]); sx+=x; sy+=y;});
+    return [sx/ring.length, sy/ring.length];
+  }
+  return [cx/(6*area), cy/(6*area)];
+}
+function computeBBox(geom, project) {
+  let rings;
+  if (geom.type==='Polygon') rings = geom.coordinates;
+  else if (geom.type==='MultiPolygon') rings = geom.coordinates.flatMap(p=>p);
+  else return [0,0,0,0];
+  let mx=Infinity,my=Infinity,MX=-Infinity,MY=-Infinity;
+  rings.forEach(r=>r.forEach(pt=>{
+    const [x,y]=project(pt[0],pt[1]);
+    if(x<mx)mx=x; if(y<my)my=y;
+    if(x>MX)MX=x; if(y>MY)MY=y;
+  }));
+  return [mx,my,MX-mx,MY-my];
+}
+
+/* BUILD + RENDER */
+function buildTowns() {
+  const { project, W, H } = projectGeometry(state.geojson);
+  state.svgSize = { W, H };
+  state.towns = state.geojson.features.map(f => {
+    const props = f.properties || {};
+    const name = props.Municipality || props.TOWN_NAME || props.TOWN ||
+                 props.NAME || props.name || props.NAMELSAD || props.town ||
+                 props.MunicipalityName || 'Unknown';
+    const county = props.County || props.COUNTY || props.county ||
+                   props.COUNTY_NAME || props.CountyName || '';
+    return {
+      name, county,
+      path: featureToPath(f.geometry, project),
+      centroid: computeCentroid(f.geometry, project),
+      bbox: computeBBox(f.geometry, project),
+    };
+  }).sort((a,b) => a.name.localeCompare(b.name));
+  state.townByName = {};
+  state.towns.forEach(t => state.townByName[t.name] = t);
+}
+
+function renderSVG() {
+  const svg = $('svg');
+  const { W, H } = state.svgSize;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = '';
+
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  defs.innerHTML = `
+    <filter id="paper" x="-2%" y="-2%" width="104%" height="104%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.4"/>
+      <feOffset dx="0" dy="1.5" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  `;
+  svg.appendChild(defs);
+
+  const gShadow = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  gShadow.setAttribute('filter', 'url(#paper)');
+  svg.appendChild(gShadow);
+
+  const gTowns = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  gShadow.appendChild(gTowns);
+  state.towns.forEach(t => {
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', t.path);
+    p.setAttribute('class', 'town');
+    p.dataset.name = t.name;
+    p.dataset.county = t.county;
+    gTowns.appendChild(p);
+  });
+
+  const gLabels = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  svg.appendChild(gLabels);
+  state.towns.forEach(t => {
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('class', 'town-label');
+    text.setAttribute('x', t.centroid[0]);
+    text.setAttribute('y', t.centroid[1]);
+    const w = t.bbox[2];
+    const fs = Math.max(5.2, Math.min(11.5, w * 0.18));
+    text.setAttribute('font-size', fs.toFixed(2));
+    text.textContent = t.name;
+    text.dataset.name = t.name;
+    gLabels.appendChild(text);
+  });
+
+  attachEventHandlers();
+  applyColoringToDOM();
+}
+
+function prefillServiceArea() {
+  const byNorm = {};
+  state.towns.forEach(t => byNorm[normalize(t.name)] = t.name);
+  let matched = 0, missing = [];
+  SERVICE_AREA.forEach(target => {
+    const actual = byNorm[normalize(target)];
+    if (actual) {
+      state.coloring[actual] = 0;
+      matched++;
+    } else {
+      missing.push(target);
+    }
+  });
+  if (missing.length) console.warn('Could not match:', missing);
+  console.log(`Pre-filled ${matched} of ${SERVICE_AREA.length} towns`);
+}
+
+function applyColoringToDOM() {
+  document.querySelectorAll('svg.ct-map .town').forEach(p => {
+    const idx = state.coloring[p.dataset.name];
+    if (idx == null || !PALETTE[idx]) {
+      p.style.fill = '#ffffff';
+      p.dataset.colored = '0';
+    } else {
+      p.style.fill = PALETTE[idx].color;
+      p.dataset.colored = '1';
+    }
+  });
+  document.querySelectorAll('svg.ct-map .town-label').forEach(t => {
+    const idx = state.coloring[t.dataset.name];
+    if (idx != null && PALETTE[idx] && !isLight(PALETTE[idx].color)) {
+      t.classList.add('on-color');
+    } else {
+      t.classList.remove('on-color');
+    }
+  });
+  updateStats();
+  renderInlineLegend();
+}
+
+function colorTown(name, idx) {
+  const prev = state.coloring[name];
+  state.history.push({ name, prev });
+  if (state.history.length > 200) state.history.shift();
+  if (prev === idx) {
+    delete state.coloring[name];
+  } else {
+    if (idx == null) delete state.coloring[name];
+    else state.coloring[name] = idx;
+  }
+  applyColoringToDOM();
+  persist();
+}
+
+function updateStats() {
+  $('stat-colored').textContent = Object.keys(state.coloring).length;
+}
+
+function renderInlineLegend() {
+  const used = new Set(Object.values(state.coloring));
+  const el = $('display-legend');
+  if (used.size === 0) {
+    el.innerHTML = '<span style="font-family:var(--cond); font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--iron-oxide); opacity:0.6;">No towns marked</span>';
+    return;
+  }
+  el.innerHTML = '';
+  PALETTE.forEach((p, i) => {
+    if (!used.has(i)) return;
+    const count = Object.values(state.coloring).filter(v => v === i).length;
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `<span class="sw" style="background:${p.color}"></span> ${escapeHTML(p.label)} <span class="num">${count}</span>`;
+    el.appendChild(item);
+  });
+}
+
+function renderSwatches() {
+  const el = $('swatches');
+  el.innerHTML = '';
+  PALETTE.forEach((p, i) => {
+    const s = document.createElement('div');
+    s.className = 'ft-swatch' + (i === state.activeColor ? ' active' : '');
+    s.style.background = p.color;
+    s.title = p.label;
+    s.dataset.i = i;
+    s.addEventListener('click', () => {
+      state.activeColor = i;
+      renderSwatches();
+    });
+    el.appendChild(s);
+  });
+}
+
+/* ===============================================================
+   ZOOM & PAN
+   =============================================================== */
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function updateViewBox() {
+  const svg = $('svg');
+  if (!state.svgSize) return;
+  const { W, H } = state.svgSize;
+  const vbW = W / state.zoom;
+  const vbH = H / state.zoom;
+  // Clamp pan so we never reveal "off-map" space
+  state.panX = clamp(state.panX, 0, W - vbW);
+  state.panY = clamp(state.panY, 0, H - vbH);
+  svg.setAttribute('viewBox', `${state.panX} ${state.panY} ${vbW} ${vbH}`);
+  $('b-fit').style.display = state.zoom > 1.01 ? '' : 'none';
+}
+
+function clientToSVG(clientX, clientY) {
+  const svg = $('svg');
+  const rect = svg.getBoundingClientRect();
+  const { W, H } = state.svgSize;
+  const vbW = W / state.zoom;
+  const vbH = H / state.zoom;
+  return {
+    x: ((clientX - rect.left) / rect.width) * vbW + state.panX,
+    y: ((clientY - rect.top) / rect.height) * vbH + state.panY,
+  };
+}
+
+function zoomAt(clientX, clientY, factor) {
+  const before = clientToSVG(clientX, clientY);
+  const newZoom = clamp(state.zoom * factor, 1, 10);
+  if (Math.abs(newZoom - state.zoom) < 0.001) return;
+  state.zoom = newZoom;
+  const svg = $('svg');
+  const rect = svg.getBoundingClientRect();
+  const { W, H } = state.svgSize;
+  const newVbW = W / newZoom;
+  const newVbH = H / newZoom;
+  state.panX = before.x - ((clientX - rect.left) / rect.width) * newVbW;
+  state.panY = before.y - ((clientY - rect.top) / rect.height) * newVbH;
+  updateViewBox();
+}
+
+function resetView() {
+  state.zoom = 1;
+  state.panX = 0;
+  state.panY = 0;
+  updateViewBox();
+}
+
+function attachEventHandlers() {
+  const svg = $('svg');
+  const tooltip = $('tooltip');
+  const pointers = new Map();   // pointerId -> { x, y }
+  let mode = null;              // 'paint' | 'pan' | 'pinch'
+  let pinchStart = null;        // { dist, zoom, cx, cy, svgPt }
+  let panStart = null;          // { x, y, panX, panY }
+  let paintedLast = null;
+  let pointerDownTime = 0;
+  let didMove = false;
+
+  function getTown(e) { return e.target.closest('.town'); }
+
+  function startPinch() {
+    const pts = Array.from(pointers.values());
+    const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+    const cx = (pts[0].x + pts[1].x) / 2;
+    const cy = (pts[0].y + pts[1].y) / 2;
+    pinchStart = {
+      dist, cx, cy,
+      zoom: state.zoom,
+      svgPt: clientToSVG(cx, cy),
+    };
+    mode = 'pinch';
+    tooltip.classList.remove('show');
+  }
+
+  function startPan(p) {
+    panStart = { x: p.x, y: p.y, panX: state.panX, panY: state.panY };
+    mode = 'pan';
+    svg.classList.add('dragging');
+    tooltip.classList.remove('show');
+  }
+
+  svg.addEventListener('pointerdown', e => {
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    svg.setPointerCapture(e.pointerId);
+    didMove = false;
+    pointerDownTime = Date.now();
+
+    if (pointers.size === 2) {
+      startPinch();
+      // Cancel any in-progress paint
+      paintedLast = null;
+      return;
+    }
+
+    // Single pointer down
+    if (state.locked) {
+      startPan({ x: e.clientX, y: e.clientY });
+    } else {
+      const t = getTown(e);
+      if (t) {
+        mode = 'paint';
+        paintedLast = t.dataset.name;
+        colorTown(t.dataset.name, state.activeColor);
+      } else {
+        // Unlocked but over empty area — let user pan
+        startPan({ x: e.clientX, y: e.clientY });
+      }
+    }
+  });
+
+  svg.addEventListener('pointermove', e => {
+    if (pointers.has(e.pointerId)) {
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      didMove = true;
+    }
+
+    // Tooltip — only show when not actively manipulating
+    if (!mode || mode === null) {
+      const t = getTown(e);
+      if (t) {
+        tooltip.innerHTML = `<span class="name">${escapeHTML(t.dataset.name)}</span><span class="co">${escapeHTML(t.dataset.county || '')}</span>`;
+        tooltip.style.left = e.clientX + 'px';
+        tooltip.style.top = e.clientY + 'px';
+        tooltip.classList.add('show');
+      } else {
+        tooltip.classList.remove('show');
+      }
+    }
+
+    if (mode === 'pinch' && pointers.size === 2) {
+      const pts = Array.from(pointers.values());
+      const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+      const cx = (pts[0].x + pts[1].x) / 2;
+      const cy = (pts[0].y + pts[1].y) / 2;
+      const factor = dist / pinchStart.dist;
+      const newZoom = clamp(pinchStart.zoom * factor, 1, 10);
+      state.zoom = newZoom;
+      const rect = svg.getBoundingClientRect();
+      const { W, H } = state.svgSize;
+      const newVbW = W / newZoom;
+      const newVbH = H / newZoom;
+      // Keep the *current* pinch center aligned with the original svg point
+      state.panX = pinchStart.svgPt.x - ((cx - rect.left) / rect.width) * newVbW;
+      state.panY = pinchStart.svgPt.y - ((cy - rect.top) / rect.height) * newVbH;
+      updateViewBox();
+    } else if (mode === 'pan' && panStart) {
+      const rect = svg.getBoundingClientRect();
+      const { W, H } = state.svgSize;
+      const vbW = W / state.zoom;
+      const vbH = H / state.zoom;
+      const dx = (e.clientX - panStart.x) / rect.width * vbW;
+      const dy = (e.clientY - panStart.y) / rect.height * vbH;
+      state.panX = panStart.panX - dx;
+      state.panY = panStart.panY - dy;
+      updateViewBox();
+    } else if (mode === 'paint') {
+      const t = getTown(e);
+      if (t && t.dataset.name !== paintedLast) {
+        paintedLast = t.dataset.name;
+        colorTown(t.dataset.name, state.activeColor);
+      }
+    }
+  });
+
+  const endPointer = e => {
+    pointers.delete(e.pointerId);
+    if (pointers.size === 0) {
+      mode = null;
+      paintedLast = null;
+      panStart = null;
+      pinchStart = null;
+      svg.classList.remove('dragging');
+    } else if (pointers.size === 1 && mode === 'pinch') {
+      // Second finger lifted — switch to pan with remaining finger
+      const remaining = Array.from(pointers.values())[0];
+      startPan(remaining);
+    }
+  };
+  svg.addEventListener('pointerup', endPointer);
+  svg.addEventListener('pointercancel', endPointer);
+  svg.addEventListener('pointerleave', e => {
+    tooltip.classList.remove('show');
+  });
+
+  // Mouse wheel zoom (desktop)
+  svg.addEventListener('wheel', e => {
+    e.preventDefault();
+    const factor = e.deltaY < 0 ? 1.18 : 1 / 1.18;
+    zoomAt(e.clientX, e.clientY, factor);
+  }, { passive: false });
+
+  // Double-click / double-tap zoom in
+  svg.addEventListener('dblclick', e => {
+    e.preventDefault();
+    zoomAt(e.clientX, e.clientY, 2);
+  });
+}
+
+function setLocked(locked) {
+  state.locked = locked;
+  document.body.classList.toggle('locked', locked);
+  $('b-lock').querySelector('.lock-text').textContent = locked ? 'Locked' : 'Edit Mode';
+  persist();
+}
+
+function persist() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      coloring: state.coloring,
+      activeColor: state.activeColor,
+      locked: state.locked,
+    }));
+  } catch (e) {}
+}
+function restore() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    if (s.coloring) state.coloring = s.coloring;
+    if (s.activeColor != null) state.activeColor = s.activeColor;
+    if (s.locked != null) state.locked = s.locked;
+    return true;
+  } catch (e) { return false; }
+}
+
+async function boot() {
+  $('b-lock').addEventListener('click', () => setLocked(!state.locked));
+  $('b-undo').addEventListener('click', () => {
+    if (!state.history.length) return;
+    const last = state.history.pop();
+    if (last.prev == null) delete state.coloring[last.name];
+    else state.coloring[last.name] = last.prev;
+    applyColoringToDOM();
+    persist();
+  });
+  $('b-reset').addEventListener('click', () => {
+    if (!confirm('Reset to the default PPW service territory (58 towns)?')) return;
+    state.coloring = {};
+    prefillServiceArea();
+    applyColoringToDOM();
+    persist();
+    toast('Reset to default territory');
+  });
+  $('b-fit').addEventListener('click', resetView);
+  $('b-print').addEventListener('click', () => {
+    // Reset zoom before printing so the full territory prints
+    resetView();
+    const pd = $('print-date');
+    if (pd) {
+      const d = new Date();
+      pd.textContent = 'PREPARED ' + d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }).toUpperCase();
+    }
+    toast('Opening print dialog');
+    setTimeout(() => window.print(), 250);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.target.matches('input,textarea')) return;
+    if ((e.ctrlKey || e.metaKey) && e.key === 'p') { e.preventDefault(); $('b-print').click(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !state.locked) { e.preventDefault(); $('b-undo').click(); }
+    if (e.key === 'l' || e.key === 'L') { $('b-lock').click(); }
+    if (e.key === 'r' || e.key === 'R') { resetView(); }
+    if (e.key === '0') { resetView(); }
+    if (e.key === '+' || e.key === '=') {
+      const r = $('svg').getBoundingClientRect();
+      zoomAt(r.left + r.width/2, r.top + r.height/2, 1.5);
+    }
+    if (e.key === '-' || e.key === '_') {
+      const r = $('svg').getBoundingClientRect();
+      zoomAt(r.left + r.width/2, r.top + r.height/2, 1/1.5);
+    }
+    const n = parseInt(e.key, 10);
+    if (!state.locked && !isNaN(n) && n >= 1 && n <= PALETTE.length) {
+      state.activeColor = n - 1;
+      renderSwatches();
+    }
+  });
+
+  const hadState = restore();
+  setLocked(state.locked);
+  renderSwatches();
+
+  let attempts = 0;
+  while (attempts < 3) {
+    try {
+      state.geojson = await loadGeoJSON();
+      break;
+    } catch (e) {
+      attempts++;
+      if (attempts >= 3) {
+        $('loading').querySelector('.pulse').style.display = 'none';
+        $('loading').querySelector('h3').textContent = "Can't reach map data";
+        $('loading').querySelector('p').innerHTML = 'Check your internet connection and reload.';
+        return;
+      }
+      await new Promise(r => setTimeout(r, 800 * attempts));
+    }
+  }
+
+  buildTowns();
+
+  if (!hadState || Object.keys(state.coloring).length === 0) {
+    prefillServiceArea();
+    persist();
+  }
+
+  renderSVG();
+  $('loading').classList.add('hidden');
+}
+
+boot();
+
+})();
+
 </script>
 </body>
 </html>
