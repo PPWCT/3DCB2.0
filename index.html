@@ -581,6 +581,78 @@ body.mode-dark .pr-card{background:var(--panel);border-color:var(--line)}
 
 /* ── MAP TAB ── */
 
+/* ── MAP TOWN SIDEBAR ── */
+#map-container { display: flex; flex-direction: row; }
+#map-town-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  background: #F5F0EB;
+  border-right: 1px solid rgba(26,26,26,.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: "Barlow Condensed", "Helvetica Neue", Arial, sans-serif;
+}
+body.mode-dark #map-town-sidebar {
+  background: #1C1C1C;
+  border-right-color: rgba(255,255,255,.08);
+}
+#map-town-sidebar .mts-head {
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid rgba(26,26,26,.1);
+  flex-shrink: 0;
+}
+body.mode-dark #map-town-sidebar .mts-head {
+  border-bottom-color: rgba(255,255,255,.07);
+}
+#map-town-sidebar .mts-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #770A0A;
+  display: block;
+  margin-bottom: 1px;
+}
+#map-town-sidebar .mts-count {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: rgba(26,26,26,.45);
+}
+body.mode-dark #map-town-sidebar .mts-count { color: rgba(255,255,255,.3); }
+#map-town-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(119,10,10,.25) transparent;
+}
+#map-town-list::-webkit-scrollbar { width: 4px; }
+#map-town-list::-webkit-scrollbar-thumb { background: rgba(119,10,10,.25); border-radius: 2px; }
+.mts-town {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  color: #1A1A1A;
+  line-height: 1.2;
+  transition: background .12s;
+}
+body.mode-dark .mts-town { color: #EDE9E4; }
+.mts-town:hover { background: rgba(119,10,10,.06); }
+.mts-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+#map-wrap-inner { flex: 1; min-width: 0; overflow: hidden; }
+
+
   :root {
     --pipeline-blue:  #8EBEEF;
     --prestige-crim:  #770A0A;
@@ -1265,6 +1337,11 @@ body.mode-dark .pr-card{background:var(--panel);border-color:var(--line)}
       <!-- ── TERRITORY MAP ── -->
       <div id="view-map" class="view" style="padding:0;margin:0;overflow:hidden">
         <div id="map-container" style="height:calc(100vh - 96px);overflow:hidden;position:relative">
+        <div id="map-town-sidebar">
+          <div class="mts-head"><span class="mts-label">Territory</span><span class="mts-count" id="mts-count">0 towns</span></div>
+          <div id="map-town-list"></div>
+        </div>
+        <div id="map-wrap-inner">
 <div class="app">
 
   <header class="brand">
@@ -1675,6 +1752,7 @@ function applyColoringToDOM() {
   });
   updateStats();
   renderInlineLegend();
+  if (typeof updateTownSidebar === "function") updateTownSidebar();
 }
 
 function colorTown(name, idx) {
@@ -1689,6 +1767,7 @@ function colorTown(name, idx) {
   }
   applyColoringToDOM();
   persist();
+  if (typeof updateTownSidebar === "function") updateTownSidebar();
 }
 
 function updateStats() {
@@ -2048,6 +2127,7 @@ async function boot() {
 
 boot();
 </script>
+        </div>
         </div>
       </div>
 
@@ -3024,6 +3104,33 @@ applyTheme(currentTheme);
 // ═══════════════════════
 // TERRITORY MAP
 // ═══════════════════════
+
+// ── Town Sidebar ──
+function updateTownSidebar() {
+  var list = document.getElementById('map-town-list');
+  var countEl = document.getElementById('mts-count');
+  if (!list) return;
+  var coloring = state.coloring;
+  var names = Object.keys(coloring).sort();
+  countEl.textContent = names.length + ' town' + (names.length !== 1 ? 's' : '');
+  list.innerHTML = '';
+  if (names.length === 0) {
+    list.innerHTML = '<div style="padding:12px;font-size:11px;color:rgba(26,26,26,.35);font-family:var(--cond);letter-spacing:.06em">No towns selected</div>';
+    return;
+  }
+  names.forEach(function(name) {
+    var idx = coloring[name];
+    var palette = [
+      '#770A0A','#8EBEEF','#E8C547','#6B8E5A','#500707'
+    ];
+    var color = palette[idx] || '#770A0A';
+    var row = document.createElement('div');
+    row.className = 'mts-town';
+    row.innerHTML = '<span class="mts-swatch" style="background:' + color + '"></span>' + name;
+    list.appendChild(row);
+  });
+}
+
 (function() {
 
 /* ===============================================================
