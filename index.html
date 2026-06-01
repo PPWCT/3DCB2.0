@@ -675,12 +675,10 @@ body.mode-dark .mts-town { color: #EDE9E4; }
   #map-container {
   button { font-family: inherit; cursor: pointer; }
 
-  .app {
+  #map-wrap-inner .app {
     display: grid;
     grid-template-rows: auto 1fr;
-    height: 100vh;
-    height: 100svh;
-    height: 100dvh;
+    height: calc(100vh - 96px);
   }
 
   /* HEADER */
@@ -1752,7 +1750,29 @@ function applyColoringToDOM() {
   });
   updateStats();
   renderInlineLegend();
-  if (typeof updateTownSidebar === "function") updateTownSidebar();
+  // Update town sidebar
+  (function() {
+    var list = document.getElementById('map-town-list');
+    var countEl = document.getElementById('mts-count');
+    if (!list || !countEl) return;
+    var coloring = state.coloring;
+    var palette = ['#770A0A','#8EBEEF','#E8C547','#6B8E5A','#500707'];
+    var names = Object.keys(coloring).sort();
+    countEl.textContent = names.length + ' town' + (names.length !== 1 ? 's' : '');
+    list.innerHTML = '';
+    if (names.length === 0) {
+      list.innerHTML = '<div style="padding:14px 12px;font-size:11px;color:rgba(26,26,26,.35);font-family:var(--cond);letter-spacing:.06em;text-transform:uppercase">No towns selected</div>';
+      return;
+    }
+    names.forEach(function(name) {
+      var idx = coloring[name];
+      var color = palette[idx] !== undefined ? palette[idx] : '#770A0A';
+      var row = document.createElement('div');
+      row.className = 'mts-town';
+      row.innerHTML = '<span class="mts-swatch" style="background:' + color + '"></span>' + name;
+      list.appendChild(row);
+    });
+  })();
 }
 
 function colorTown(name, idx) {
@@ -1767,7 +1787,6 @@ function colorTown(name, idx) {
   }
   applyColoringToDOM();
   persist();
-  if (typeof updateTownSidebar === "function") updateTownSidebar();
 }
 
 function updateStats() {
@@ -3105,31 +3124,6 @@ applyTheme(currentTheme);
 // TERRITORY MAP
 // ═══════════════════════
 
-// ── Town Sidebar ──
-function updateTownSidebar() {
-  var list = document.getElementById('map-town-list');
-  var countEl = document.getElementById('mts-count');
-  if (!list) return;
-  var coloring = state.coloring;
-  var names = Object.keys(coloring).sort();
-  countEl.textContent = names.length + ' town' + (names.length !== 1 ? 's' : '');
-  list.innerHTML = '';
-  if (names.length === 0) {
-    list.innerHTML = '<div style="padding:12px;font-size:11px;color:rgba(26,26,26,.35);font-family:var(--cond);letter-spacing:.06em">No towns selected</div>';
-    return;
-  }
-  names.forEach(function(name) {
-    var idx = coloring[name];
-    var palette = [
-      '#770A0A','#8EBEEF','#E8C547','#6B8E5A','#500707'
-    ];
-    var color = palette[idx] || '#770A0A';
-    var row = document.createElement('div');
-    row.className = 'mts-town';
-    row.innerHTML = '<span class="mts-swatch" style="background:' + color + '"></span>' + name;
-    list.appendChild(row);
-  });
-}
 
 (function() {
 
